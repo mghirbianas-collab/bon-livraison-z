@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="fr"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>BL Vente directe</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#1e2d3d">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}[hidden]{display:none!important}
+body{font-family:system-ui,sans-serif;background:#f0f2f5;color:#1e2d3d}
+body:not(.admin) .adm{display:none!important}
+.topnav{background:#1e2d3d;display:flex;align-items:center;gap:4px;padding:0 10px;height:52px;overflow-x:auto;position:sticky;top:0;z-index:100}
+.topnav b{color:#2ecc71;margin-right:8px}#who{font-size:12px;color:#8899aa;white-space:nowrap;margin-left:auto}
+.nb{background:none;border:0;color:#9ab;padding:7px 11px;border-radius:8px;font-size:12px;cursor:pointer;white-space:nowrap}.nb.on{background:#2ecc71;color:#1e2d3d;font-weight:600}
+.page{display:none;padding:14px;max-width:960px;margin:auto}.page.on{display:block}
+.card{background:#fff;border-radius:12px;box-shadow:0 1px 4px #0001;margin-bottom:12px;padding:14px}.card h3{font-size:14px;margin-bottom:10px}
+.bar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:10px}.bar h3{margin:0;flex:1}
+input,textarea,select{width:100%;padding:8px 10px;border:1.5px solid #e0e5ea;border-radius:8px;font:inherit;font-size:13px;background:#fff}input:focus,textarea:focus,select:focus{outline:0;border-color:#2ecc71}
+.btn{padding:7px 12px;border:0;border-radius:8px;cursor:pointer;font:inherit;font-size:13px}.btn:disabled{opacity:.5}
+.g{background:#2ecc71;color:#fff}.s{background:#eef1f4}.r{background:#fee2e2;color:#dc2626}.sm{padding:4px 8px;font-size:12px}
+.tw{overflow-x:auto}table{width:100%;border-collapse:collapse}th{background:#f8f9fa;padding:8px;text-align:left;font-size:11px;color:#89a}td{padding:8px;border-top:1px solid #f0f2f5;font-size:13px}
+.mono{font-family:monospace;font-size:12px}.pr{color:#27ae60;font-weight:600;white-space:nowrap}.nw{white-space:nowrap}.mut{color:#999;font-size:12px;padding:8px}.neg{color:#dc2626;font-weight:600}
+.dd-wrap{position:relative}.dd{position:absolute;left:0;right:0;top:100%;z-index:50;background:#fff;border:1.5px solid #2ecc71;border-radius:8px;max-height:260px;overflow:auto;box-shadow:0 8px 24px #0003}
+.di{padding:9px 12px;border-top:1px solid #f3f3f3;cursor:pointer;display:flex;justify-content:space-between;gap:8px;font-size:13px}.di:hover{background:#f0fdf4}
+.pi{display:flex;align-items:center;flex-wrap:wrap;gap:8px;background:#f8f9fa;border-radius:8px;padding:8px 10px;margin-bottom:6px}.pn{flex:1;min-width:140px;font-size:13px}.pn small{display:block;color:#999}.pi input{width:62px;text-align:center}.pi input.pp{width:80px}
+.q{width:28px;height:28px;border:0;border-radius:6px;background:#2ecc71;color:#fff;font-weight:700;cursor:pointer}
+.tot{background:#1e2d3d;color:#2ecc71;border-radius:12px;padding:14px;font-size:18px;font-weight:700;display:flex;justify-content:space-between}
+.overlay{position:fixed;inset:0;background:#0006;z-index:500;display:flex;align-items:center;justify-content:center;padding:12px}
+.modal{background:#fff;border-radius:14px;width:100%;max-width:480px;max-height:90vh;overflow:auto;padding:18px}.modal h3{margin-bottom:12px}
+.mf{display:flex;justify-content:flex-end;gap:8px;margin-top:14px}.fg{margin-bottom:10px}.fg label{display:block;font-size:11px;font-weight:600;margin-bottom:3px;color:#567}
+#login{max-width:340px;margin:12vh auto;padding:0 16px}
+.kp{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px;margin-bottom:12px}.kp div{background:#f8f9fa;border-radius:8px;padding:8px 10px;font-size:11px;color:#89a}.kp b{display:block;font-size:15px;color:#1e2d3d}
+.bar label{font-size:12px;display:flex;align-items:center;gap:4px}
+#tk{display:none}
+@media print{@page{size:80mm auto;margin:0}body>*:not(#tk){display:none!important}body{background:#fff}
+#tk{display:block;width:100%;box-sizing:border-box;margin:0;padding:3mm 2mm;font:14px/1.35 monospace;color:#000}
+#tk h2{font-size:14px;text-align:center}#tk .c{text-align:center}#tk .r{display:flex;justify-content:space-between;gap:6px}#tk .t{font-size:15px;font-weight:700}#tk hr{border:0;border-top:1px dashed #000;margin:4px 0}}
+</style></head><body>
+
+<div id="login"><div class="card"><h3>🧾 BL Vente directe — Connexion</h3>
+<form id="lf"><div class="fg"><label>Email</label><input id="le" type="email" required autocomplete="username"></div>
+<div class="fg"><label>Mot de passe</label><input id="lp" type="password" required autocomplete="current-password"></div>
+<button class="btn g" style="width:100%">Se connecter</button></form></div></div>
+
+<div id="app" hidden>
+<div class="topnav"><b>🧾 BL</b>
+<button class="nb" data-go="cmd">➕ Vente</button><button class="nb" data-go="hist">📋 BL</button><button class="nb" data-go="art">📦 Articles</button><button class="nb" data-go="cli">👥 Clients</button><button class="nb" data-go="jr">📒 Journal</button><button class="nb adm" data-go="usr">⚙️ Admin</button>
+<span id="who"></span><button class="nb" id="net" data-act="sync" title="État du réseau — toucher pour synchroniser">🟢 En ligne</button><button class="nb" id="btb" data-act="btpair" title="Connecter l'imprimante Bluetooth">🖨️</button><button class="nb" data-act="refresh">🔄</button><button class="nb" data-act="logout">Quitter</button></div>
+
+<div id="p_cmd" class="page">
+<div id="eb" class="card" hidden style="background:#fef3c7"><div class="bar" style="margin:0"><h3 id="et"></h3><button class="btn s sm" data-act="cancel">Annuler la modification</button></div></div>
+<div class="card"><h3>👤 Client et paiement</h3><div style="display:flex;gap:6px"><input id="cl" list="cls" autocomplete="off" style="flex:1" placeholder="Nom du client (existant ou nouveau — vide = comptoir)"><button class="btn g" data-act="scan" data-t="cl" title="Scanner le QR code du client">📷</button></div><datalist id="cls"></datalist><div id="ci" class="mut" style="padding:4px 0"></div>
+<select id="mp"><option value="especes">💵 Espèces</option><option value="cheque">🧾 Chèque</option><option value="credit">⏳ Crédit (à régler plus tard)</option></select></div>
+<div class="card" style="position:relative;z-index:10"><h3>📦 Articles</h3><div style="display:flex;gap:6px"><div class="dd-wrap" style="flex:1"><input id="aq" placeholder="🔍 Référence ou désignation…" autocomplete="off"><div id="dda" class="dd" hidden></div></div><button class="btn g" data-act="scan" data-t="aq" title="Scanner un code">📷</button></div><div id="cart" style="margin-top:10px"></div></div>
+<div class="card"><h3>📝 Notes</h3><textarea id="notes" rows="2"></textarea></div>
+<div class="tot"><span>TOTAL TTC</span><span id="total">0,000 DT</span></div>
+<div class="adm mut" id="mg"></div>
+<button id="vbtn" class="btn g" style="width:100%;margin-top:10px;padding:13px" data-act="valider" disabled></button></div>
+
+<div id="p_hist" class="page"><div class="card"><div class="bar"><h3>📋 Bons de livraison</h3><input id="hs" placeholder="🔍 N°, client, vendeur…" style="width:200px"><select id="tsz" style="width:auto" title="Taille du texte du ticket"><option value="12">Ticket : texte petit</option><option value="14">Ticket : texte normal</option><option value="16">Ticket : texte grand</option><option value="18">Ticket : texte très grand</option></select><select id="pw" style="width:auto" title="Largeur du ticket en Bluetooth direct"><option value="48">Bluetooth : 48 car. (80 mm)</option><option value="42">Bluetooth : 42 car.</option><option value="32">Bluetooth : 32 car. (58 mm)</option></select></div><div id="hist"></div></div></div>
+
+<div id="p_art" class="page"><div class="card"><div class="bar"><h3>📦 Articles <small id="ac"></small></h3><input id="as" placeholder="🔍 Réf. ou désignation…" style="width:200px"><button class="btn s sm" data-act="scan" data-t="as" title="Scanner un code">📷</button>
+<button class="btn s sm" data-act="xl" data-t="articles">📤 Excel</button><button class="btn s sm adm" data-act="imp" data-t="articles">📥 Importer</button><button class="btn g sm adm" data-act="add">➕ Nouveau</button></div><div id="art"></div><div class="adm" style="margin-top:12px"><button class="btn r sm" data-act="delAll" data-t="articles">🗑️ Supprimer tous les articles</button></div></div></div>
+<div id="p_jr" class="page"><div class="card"><div class="bar"><h3>📒 Journal de vente</h3></div>
+<div class="bar"><label>Du <input type="date" id="jd1" style="width:150px"></label><label>Au <input type="date" id="jd2" style="width:150px"></label>
+<button class="btn s sm" data-act="jp" data-d="0">Aujourd'hui</button><button class="btn s sm" data-act="jp" data-d="1">Hier</button><button class="btn s sm" data-act="jp" data-d="7">7 jours</button><button class="btn s sm" data-act="jp" data-d="m">Ce mois</button></div>
+<div class="bar"><button class="btn g sm" data-act="jx">📊 Excel</button><button class="btn g sm" data-act="jf">📄 PDF</button><button class="btn g sm" data-act="jc">🗂️ Copies des BL (PDF)</button><button class="btn s sm" data-act="jt">🖨️ Ticket</button></div><div id="jr"></div></div></div>
+<div id="p_usr" class="page"><div class="card"><h3>💾 Sauvegarde et restauration</h3><p class="mut">La sauvegarde contient les articles (avec stock), les clients, tous les BL et les règlements. Le fichier est enregistré dans le dossier Téléchargements de votre téléphone ou PC.</p><div class="bar"><button class="btn g" data-act="bak">💾 Sauvegarder toutes les données</button><button class="btn s" data-act="rest">📂 Restaurer une sauvegarde</button></div></div><div class="card"><h3>🔑 Utilisateurs et rôles</h3><p class="mut">Créez les comptes dans Supabase (Authentication > Users) : ils apparaissent ici avec le rôle « Utilisateur ».</p><div id="usr"></div></div></div>
+<div id="p_cli" class="page"><div class="card"><div class="bar"><h3>👥 Clients <small id="cc"></small></h3><input id="cq" placeholder="🔍 Nom, code, tél., matricule…" style="width:200px"><button class="btn s sm" data-act="scan" data-t="cq" title="Scanner un code">📷</button><button class="btn s sm" id="cdb" data-act="cdebt">💳 Clients avec solde</button><button class="btn s sm" data-act="xl" data-t="clients">📤 Excel</button><button class="btn s sm" data-act="imp" data-t="clients">📥 Importer</button><button class="btn g sm" data-act="addC">➕ Nouveau</button></div><div id="cli"></div><div class="adm" style="margin-top:12px"><button class="btn r sm" data-act="delAll" data-t="clients">🗑️ Supprimer tous les clients</button></div></div></div>
+<input type="file" id="fi" accept=".xlsx,.xls,.csv" hidden><input type="file" id="fr" accept=".json,application/json" hidden>
+</div>
+
+<div id="ov" class="overlay" hidden><div class="modal"><h3 id="mt"></h3><div id="mb"></div><div class="mf"><button class="btn s" data-act="close">Annuler</button><button class="btn g" id="mok">Valider</button></div></div></div>
+<div id="sc" class="overlay" style="z-index:600" hidden><div class="modal"><h3>Scanner un code</h3><div id="qr" style="width:100%"></div><p class="mut">Placez le QR code ou le code-barres devant la caméra.</p><div class="mf"><button class="btn s" data-act="scanx">Annuler</button></div></div></div>
+<div id="tk"></div>
+
+<script>
+// ⚠️ À remplacer par les valeurs de votre NOUVEAU projet Supabase
+const SUPABASE_URL='https://qdsxoufmftkqtpovvkjp.supabase.co', SUPABASE_KEY='sb_publishable_QzwPSlWNhj_YR2jupgTZXA_BXVKEBML';
+const FOOTER='© SABEUR — Tél : 55296392';
+const sb=supabase.createClient(SUPABASE_URL,SUPABASE_KEY,{global:{fetch:(u,o={})=>fetch(u,o.signal?o:{...o,signal:AbortSignal.timeout(15000)})}});
+const $=id=>document.getElementById(id);
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const norm=s=>String(s??'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase();
+const match=(t,q)=>{t=norm(t);return norm(q).split(/\s+/).filter(Boolean).every(w=>t.includes(w))};
+const r3=n=>Math.round(Number(n||0)*1000)/1000, fmt=n=>r3(n).toFixed(3).replace('.',',')+' DT';
+const num=v=>parseFloat(String(v||'0').replace(/\s/g,'').replace(',','.'))||0;
+const dt=s=>new Date(s).toLocaleString('fr-FR',{dateStyle:'short',timeStyle:'short'});
+let me=null,articles=[],clients=[],bls=[],panier=[],editId=null,old={},okFn;
+const isAdmin=()=>me?.role==='admin';
+const rd=async q=>{const {data,error}=await q;if(error)throw error;return data};
+function toast(m,e){const t=document.createElement('div');t.textContent=m;t.style.cssText='position:fixed;bottom:20px;left:50%;transform:translateX(-50%);padding:10px 18px;border-radius:8px;color:#fff;font-size:13px;z-index:999;max-width:90vw;background:'+(e?'#dc2626':'#2ecc71');document.body.append(t);setTimeout(()=>t.remove(),3800)}
+function modal(t,h,fn){$('mok').hidden=false;$('mt').textContent=t;$('mb').innerHTML=h;okFn=fn;$('ov').hidden=false}
+const closeModal=()=>{$('ov').hidden=true;qrStop()};
+const table=(h,r)=>r.length?`<div class="tw"><table><thead><tr>${h.map(x=>x==='#'?'<th class="adm"></th>':x.startsWith('*')?`<th class="adm">${x.slice(1)}</th>`:`<th>${x}</th>`).join('')}</tr></thead><tbody>${r.join('')}</tbody></table></div>`:'<p class="mut">Aucun résultat</p>';
+
+// ── Mode hors ligne ──
+const IDB=(()=>{let d;const o=()=>d||(d=new Promise((ok,ko)=>{const r=indexedDB.open('bl-vente',1);r.onupgradeneeded=()=>r.result.createObjectStore('kv');r.onsuccess=()=>ok(r.result);r.onerror=()=>ko(r.error)}));
+  return {get:async k=>{const db=await o();return new Promise((ok,ko)=>{const q=db.transaction('kv').objectStore('kv').get(k);q.onsuccess=()=>ok(q.result);q.onerror=()=>ko(q.error)})},
+    set:async(k,v)=>{const db=await o();return new Promise((ok,ko)=>{const t=db.transaction('kv','readwrite');t.objectStore('kv').put(v,k);t.oncomplete=ok;t.onerror=()=>ko(t.error)})}}})();
+let QUEUE=[],NET=true,syncing=false;
+const isNet=e=>!navigator.onLine||/fetch|network|offline|load failed|timed out|timeout|abort/i.test(String(e?.message||e||''));
+const uid=()=>crypto.randomUUID?crypto.randomUUID():'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g,c=>{const r=Math.random()*16|0;return (c==='x'?r:r&3|8).toString(16)});
+const saveQ=()=>IDB.set('queue',QUEUE).catch(()=>{}),saveLocal=()=>IDB.set('data',{articles,clients,bls:bls.slice(0,300)}).catch(()=>{});
+async function loadLocal(){const d=await IDB.get('data').catch(()=>null);if(!d)return false;articles=d.articles||[];clients=d.clients||[];bls=d.bls||[];return true}
+function netUI(){const e=$('net');if(!e)return;const off=!navigator.onLine||!NET;e.textContent=(off?'⚠️ Hors ligne':'🟢 En ligne')+(QUEUE.length?' · '+QUEUE.length+' en attente':'');e.style.color=off||QUEUE.length?'#f59e0b':''}
+async function syncQueue(){if(syncing||!QUEUE.length||!me)return 0;syncing=true;let n=0;
+  try{while(QUEUE.length){const it=QUEUE[0];
+    if(it.type==='bl')await rd(sb.rpc('creer_bl',{p:it.p}));else await rd(sb.from('reglements').upsert(it.row,{onConflict:'id',ignoreDuplicates:true}));
+    QUEUE.shift();n++;await saveQ()}}
+  catch(e){if(!isNet(e))toast('Synchronisation : '+(e.message||e),1)}
+  syncing=false;netUI();if(n&&!QUEUE.length)toast(n+' opération(s) hors ligne synchronisée(s)');return n}
+async function offlineSale(p){let dv='XX',n=1;
+  try{dv=localStorage.dev||(localStorage.dev=Math.random().toString(36).slice(2,4).toUpperCase());n=(+localStorage.bln||0)+1;localStorage.bln=n}catch{}
+  const total=r3(S(p.lignes,l=>l.total)),b={...p,numero:'BL-L'+dv+'-'+String(n).padStart(4,'0'),created_at:new Date().toISOString(),total,marge:r3(S(p.lignes,l=>(l.prix-l.pa)*l.qte)),pending:true};
+  QUEUE.push({type:'bl',p:{...p,numero:b.numero,date:b.created_at}});
+  p.lignes.forEach(l=>{const a=articles.find(x=>x.id===l.id);if(a)a.stock=r3(Number(a.stock)-l.qte)});
+  if(p.client){let c=clients.find(x=>norm(x.nom)===norm(p.client));if(!c){c={id:'loc-'+uid(),code:'',nom:p.client,telephone:'',matricule_fiscal:'',adresse:'',solde:0};clients.push(c)}
+    if(p.mode==='credit')c.solde=r3(Number(c.solde)+total);b.client_id=c.id}
+  bls.unshift(b);await saveQ();await saveLocal();toast('Hors ligne : BL enregistré, synchronisation automatique au retour du réseau');reset();netUI();render();go('hist');tick(b)}
+
+// ── Connexion ──
+$('lf').onsubmit=async e=>{e.preventDefault();const {data,error}=await sb.auth.signInWithPassword({email:$('le').value.trim(),password:$('lp').value});if(error)return toast('Email ou mot de passe incorrect',1);start(data.user)};
+async function start(u){
+  let data=null;try{data=(await sb.from('profiles').select('*').eq('id',u.id).maybeSingle()).data}catch{}
+  me=data||await IDB.get('me').catch(()=>null)||{id:u.id,nom:u.email,role:'user'};if(data){IDB.set('me',me).catch(()=>{});IDB.set('user',{id:u.id,email:u.email}).catch(()=>{})}
+  QUEUE=(await IDB.get('queue').catch(()=>null))||[];
+  $('login').hidden=true;$('app').hidden=false;document.body.classList.toggle('admin',isAdmin());
+  $('who').textContent=me.nom+(isAdmin()?' · admin':'');btRestore();go('cmd');cart();await loadAll()}
+(async()=>{let r={};try{r=await sb.auth.getSession()}catch(e){r={error:e}}
+  if(r.data?.session)return start(r.data.session.user);
+  const u=await IDB.get('user').catch(()=>null);if(u&&(!navigator.onLine||isNet(r.error)))start(u)})();
+
+// ── Données ──
+async function all(t,o){let r=[],i=0;for(;;){const d=await rd(sb.from(t).select('*').order(o).order('id').range(i,i+999));r=r.concat(d);if(d.length<1000)return r;i+=1000}}
+async function loadAll(){
+  if(QUEUE.length&&navigator.onLine)await syncQueue();
+  if(QUEUE.length){await loadLocal();NET=false}
+  else{try{[articles,clients,bls]=await Promise.all([all('articles','designation'),all('clients_solde','nom'),rd(sb.from('bl').select('*').order('created_at',{ascending:false}).limit(300))]);NET=true;saveLocal()}
+    catch(e){NET=false;const ok=await loadLocal();toast(isNet(e)?(ok?'Mode hors ligne : données locales':'Hors ligne : aucune donnée locale (connectez-vous une première fois avec internet)'):'Chargement impossible : '+e.message,!ok||!isNet(e))}}
+  netUI();render()}
+function render(){renderHist();renderArt();renderCli();cinfo();cart()}
+const MP={especes:'💵 Espèces',cheque:'🧾 Chèque',credit:'⏳ Crédit'},MT={especes:'Espèces',cheque:'Chèque',credit:'Crédit'};
+async function loadUsers(){try{const u=await rd(sb.from('profiles').select('*').order('nom'));
+  $('usr').innerHTML=table(['Nom','Email','Rôle'],u.map(x=>`<tr><td><b>${esc(x.nom)}</b></td><td>${esc(x.email)}</td><td><select data-u="${x.id}" ${x.id===me.id?'disabled':''}><option value="user" ${x.role==='user'?'selected':''}>Utilisateur</option><option value="admin" ${x.role==='admin'?'selected':''}>Administrateur</option></select></td></tr>`))}catch(e){toast(e.message,1)}}
+function go(p){if(p==='usr')loadUsers();if(p==='jr')loadJournal();document.querySelectorAll('.page').forEach(x=>x.classList.toggle('on',x.id==='p_'+p));document.querySelectorAll('.nb[data-go]').forEach(x=>x.classList.toggle('on',x.dataset.go===p))}
+const stk=a=>`<span class="${a.stock<=0?'neg':''}">${r3(a.stock)}</span>`;
+
+function renderArt(){const l=articles.filter(a=>match((a.reference||'')+' '+a.designation,$('as').value));$('ac').textContent=`(${articles.length})`;
+  $('art').innerHTML=table(['Réf.','Désignation','*Achat','Vente','*Marge','Stock','#'],l.slice(0,100).map(a=>{const m=a.prix_vente-a.prix_achat;
+    return `<tr><td class="mono">${esc(a.reference)}</td><td><b>${esc(a.designation)}</b></td><td class="adm nw">${fmt(a.prix_achat)}</td><td class="pr">${fmt(a.prix_vente)}</td><td class="adm nw">${fmt(m)}${a.prix_achat>0?` (${Math.round(m/a.prix_achat*100)}%)`:''}</td><td>${stk(a)}</td><td class="adm nw"><button class="btn s sm" data-act="edit" data-id="${a.id}">✏️</button> <button class="btn r sm" data-act="del" data-id="${a.id}">🗑️</button></td></tr>`}))+(l.length>100?`<p class="mut">100 premiers résultats sur ${l.length} — affinez la recherche.</p>`:'')}
+function renderHist(){const l=bls.filter(c=>match(c.numero+' '+(c.client||'')+' '+(c.vendeur||''),$('hs').value));
+  $('hist').innerHTML=table(['N°','Client','Vendeur','Date','Total','Paiement','*Marge',''],l.slice(0,150).map(c=>`<tr><td><b>${esc(c.numero)}</b>${c.pending?' ⏳':''}</td><td>${esc(c.client)||'<small>comptoir</small>'}</td><td>${esc(c.vendeur)}</td><td>${dt(c.created_at)}</td><td class="pr">${fmt(c.total)}</td><td class="nw">${MP[c.mode_paiement]||''}</td><td class="adm nw">${fmt(c.marge)}</td><td class="nw"><button class="btn s sm" data-act="tick" data-id="${c.id}">🖨️</button> <button class="btn s sm adm" data-act="editBL" data-id="${c.id}">✏️</button> <button class="btn r sm adm" data-act="delBL" data-id="${c.id}">🗑️</button></td></tr>`))}
+
+// ── Vente (BL) ──
+function dd(){const l=articles.filter(x=>match((x.reference||'')+' '+x.designation,$('aq').value)).slice(0,40);
+  $('dda').innerHTML=l.map(x=>`<div class="di" data-act="pickA" data-id="${x.id}"><span><b>${esc(x.designation)}</b><br><small>${esc(x.reference)} · stock ${stk(x)}</small></span><span class="pr">${fmt(x.prix_vente)}</span></div>`).join('')||'<div class="di">Aucun résultat</div>';$('dda').hidden=false}
+const dispo=p=>(articles.find(a=>a.id===p.id)?.stock||0)+(old[p.id]||0);
+function cart(){
+  $('cart').innerHTML=panier.map((p,i)=>`<div class="pi"><div class="pn"><b>${esc(p.designation)}</b><small>${esc(p.reference)} · <span class="${p.qte>dispo(p)?'neg':''}">stock ${r3(dispo(p))}</span></small></div><button class="q" data-act="dec" data-i="${i}">−</button><input type="number" min="0.001" step="any" value="${p.qte}" data-q="${i}"><button class="q" data-act="inc" data-i="${i}">+</button><input class="pp" type="number" step="0.001" value="${p.prix}" data-p="${i}"><span class="pr">${fmt(p.prix*p.qte)}</span><button class="btn r sm" data-act="rm" data-i="${i}">✕</button></div>`).join('');
+  const t=panier.reduce((s,p)=>s+p.prix*p.qte,0),m=panier.reduce((s,p)=>s+(p.prix-p.pa)*p.qte,0);
+  $('total').textContent=fmt(t);$('mg').textContent='Marge : '+fmt(m);$('vbtn').disabled=!panier.length;
+  $('vbtn').textContent=editId?'💾 Enregistrer la modification':'✅ Valider et imprimer le ticket';
+  $('eb').hidden=!editId;if(editId)$('et').textContent='✏️ Modification du '+bls.find(b=>b.id===editId)?.numero}
+function addLine(a){const p=panier.find(x=>x.id===a.id);if(p)p.qte++;else panier.unshift({id:a.id,reference:a.reference||'',designation:a.designation,prix:Number(a.prix_vente),pa:Number(a.prix_achat),qte:1});cart()}
+function pickA(d){$('aq').value='';$('dda').hidden=true;addLine(articles.find(x=>x.id===d.id))}
+function reset(){panier=[];editId=null;old={};$('cl').value='';$('mp').value='especes';$('notes').value='';cinfo();cart()}
+async function valider(){
+  const L=panier.map(p=>({id:p.id,reference:p.reference,designation:p.designation,qte:p.qte,prix:p.prix,pa:p.pa,total:r3(p.prix*p.qte)}));
+  if(L.some(p=>p.qte>dispo(p))&&!confirm('Stock insuffisant pour certains articles. Continuer quand même ?'))return;
+  const p={id:editId?undefined:uid(),client:$('cl').value.trim(),mode:$('mp').value,vendeur:me.nom,notes:$('notes').value.trim(),lignes:L};
+  if(p.mode==='credit'&&!p.client)return toast('Indiquez le client pour une vente à crédit',1);$('vbtn').disabled=true;
+  try{if(!navigator.onLine)throw new Error('offline');const b=await rd(editId?sb.rpc('modifier_bl',{p_id:editId,p}):sb.rpc('creer_bl',{p}));
+    const modif=!!editId;toast(modif?'BL modifié, stock ajusté':'BL enregistré, stock mis à jour');reset();await loadAll();go('hist');if(!modif)tick(b)}
+  catch(e){if(!editId&&isNet(e))return offlineSale(p);toast(editId&&isNet(e)?'Modification impossible hors ligne':e.message,1);cart()}}
+function editBL(d){const b=bls.find(x=>x.id===d.id);if(b.pending||!navigator.onLine)return toast('Modification impossible : BL non synchronisé ou hors ligne',1);editId=b.id;old={};panier=b.lignes.map(l=>{old[l.id]=l.qte;return {id:l.id,reference:l.reference,designation:l.designation,prix:l.prix,pa:l.pa,qte:l.qte}});
+  $('cl').value=b.client||'';$('mp').value=b.mode_paiement||'especes';$('notes').value=b.notes||'';go('cmd');cinfo();cart()}
+async function delBL(d){if(!navigator.onLine||bls.find(x=>x.id===d.id)?.pending)return toast('Suppression impossible : BL non synchronisé ou hors ligne',1);if(!confirm('Supprimer ce BL ? Le stock sera restitué.'))return;try{await rd(sb.rpc('supprimer_bl',{p_id:d.id}));toast('BL supprimé, stock restitué');loadAll()}catch(e){toast(e.message,1)}}
+
+// ── Ticket (imprimante thermique 80 mm) ──
+const tfs=()=>{try{return localStorage.tsz||14}catch{return 14}},pr=()=>{$('tk').style.fontSize=tfs()+'px';setTimeout(()=>window.print(),150)};
+// ── Impression directe Bluetooth (ESC/POS, imprimantes Bluetooth LE) ──
+let BT=null;const ci=b=>clients.find(c=>c.id===b.client_id)||{},btSaved=()=>{try{return localStorage.btok==='1'}catch{return false}};
+const BTS=[0x18f0,0xff00,0xffe0,0xfee7,0xae30,'49535343-fe7d-4ae5-8fa9-9fafd205e455','e7810a71-73ae-499d-8c15-faa9aef0c3f2'];
+const pw=()=>{try{return +localStorage.pw||48}catch{return 48}};
+const CP={'é':130,'è':138,'à':133,'ç':135,'ê':136,'â':131,'î':140,'ô':147,'û':150,'ù':151,'ë':137,'ï':139,'ü':129,'ö':148,'ä':132,'É':144,'Ç':128,'Ä':142,'Ö':153,'Ü':154,'°':248};
+function enc(t){const o=[];for(const ch of String(t??'').normalize('NFC').replace(/©/g,'(c)').replace(/[—–]/g,'-').replace(/[’‘]/g,"'").replace(/·/g,'-').replace(/œ/g,'oe')){const c=ch.charCodeAt(0);if(c<128)o.push(c);else if(CP[ch])o.push(CP[ch]);else{const b=ch.normalize('NFD').charCodeAt(0);o.push(b<128?b:63)}}return o}
+const wrap=(t,w)=>{const r=[];let s=String(t??'').normalize('NFC');while(s.length>w){let i=s.lastIndexOf(' ',w);if(i<=0)i=w;r.push(s.slice(0,i));s=s.slice(i).trimStart()}r.push(s);return r};
+const lr=(a,b,w)=>{a=String(a);b=String(b);if(a.length+b.length>=w)a=a.slice(0,Math.max(0,w-b.length-1));return a.padEnd(w-b.length)+b};
+function escp(W,fn){const o=[27,64,27,116,0],H='-'.repeat(W),T=s=>o.push(...enc(s),10),C=a=>o.push(...a),L=(a,b)=>T(lr(a,b,W));fn({T,C,H,L});C([27,100,4]);return Uint8Array.from(o)}
+const escBL=(b,W)=>escp(W,({T,C,H,L})=>{C([27,97,1,27,69,1,29,33,17]);T('BON DE LIVRAISON');C([29,33,0]);T(b.numero);C([27,69,0]);T(dt(b.created_at));C([27,97,0]);
+  T('Vendeur : '+(b.vendeur||''));if(b.client)T('Client : '+b.client);if(ci(b).matricule_fiscal)T('MF : '+ci(b).matricule_fiscal);if(ci(b).adresse)wrap('Adresse : '+ci(b).adresse,W).forEach(x=>T(x));T('Paiement : '+(MT[b.mode_paiement]||''));T(H);
+  b.lignes.forEach(l=>{wrap(l.designation,W).forEach(x=>T(x));L(l.qte+' x '+r3(l.prix).toFixed(3),r3(l.total).toFixed(3))});
+  T(H);C([27,69,1,29,33,1]);L('TOTAL',fmt(b.total));C([29,33,0,27,69,0]);if(b.notes)wrap(b.notes,W).forEach(x=>T(x));T(H);C([27,97,1]);T('Merci de votre confiance');T(FOOTER)});
+const escJ=(o,W)=>escp(W,({T,C,H,L})=>{C([27,97,1,27,69,1]);T('JOURNAL DES VENTES');C([27,69,0]);T('Du '+fd(J.from)+' au '+fd(J.to));T('Imprimé le '+dt(new Date()));C([27,97,0]);T(H);
+  L('Nombre de BL',o.nb);L('Total ventes',fmt(o.total));T(H);L('Ventes espèces',fmt(o.especes));L('Ventes chèque',fmt(o.cheque));L('Ventes crédit',fmt(o.credit));L('Règl. espèces',fmt(o.re));L('Règl. chèque',fmt(o.rc));T(H);
+  L('Espèces encaissé',fmt(o.ee));L('Chèques encaissé',fmt(o.ec));C([27,69,1,29,33,1]);L('ENCAISSÉ',fmt(o.enc));C([29,33,0,27,69,0]);if(isAdmin()){T(H);L('Marge',fmt(o.marge))}});
+async function btRestore(){if(BT?.dev||!navigator.bluetooth?.getDevices)return;try{const l=await navigator.bluetooth.getDevices(),n=localStorage.btname,d=l.find(x=>x.name===n)||l[0];if(d){BT={dev:d,ch:null};$('btb').classList.add('on')}}catch{}}
+async function btConnect(force){
+  if(!navigator.bluetooth)throw new Error("Bluetooth indisponible ici. Android : utilisez Chrome. iPhone : utilisez le navigateur Bluefy.");
+  if(!force&&BT?.ch&&BT.dev.gatt.connected)return BT.ch;
+  const dev=!force&&BT?.dev?BT.dev:await navigator.bluetooth.requestDevice({acceptAllDevices:true,optionalServices:BTS}),srv=await dev.gatt.connect();let ch=null;
+  for(const s of await srv.getPrimaryServices()){if(/^0000180[01]-/.test(s.uuid))continue;for(const c of await s.getCharacteristics())if(c.properties.write||c.properties.writeWithoutResponse){ch=c;break}if(ch)break}
+  if(!ch)throw new Error("Aucun canal d'écriture trouvé : cette imprimante n'est peut-être pas en Bluetooth LE");
+  BT={dev,ch};return ch}
+async function btSend(b){const ch=await btConnect(),nr=!ch.properties.write;
+  for(let i=0;i<b.length;i+=20){const p=b.slice(i,i+20);await(nr?ch.writeValueWithoutResponse(p):ch.writeValue(p));await new Promise(r=>setTimeout(r,25))}}
+const btErr=e=>{if(e.name!=='NotFoundError')toast('Bluetooth : '+(e.message||e),1)};
+async function btpair(){
+  if(BT?.dev){if(!confirm("Imprimante connectée ("+(BT.dev.name||'Bluetooth')+"). La déconnecter et revenir à l'impression par le navigateur ?"))return;try{BT.dev.gatt.disconnect()}catch{}BT=null;try{localStorage.removeItem('btok')}catch{}$('btb').classList.remove('on');return toast("Retour à l'impression par le navigateur")}
+  try{await btConnect(true);try{localStorage.btok='1';localStorage.btname=BT.dev.name||''}catch{}$('btb').classList.add('on');toast('Imprimante connectée : '+(BT.dev.name||''));await btSend(escp(pw(),({T,C})=>{C([27,97,1]);T('Imprimante connectee');T(BT.dev.name||'')}))}catch(e){BT=null;btErr(e)}}
+
+function tick(b,w){if(!w&&!BT?.dev&&btSaved())return btRestore().then(()=>tick(b,1));if(BT?.dev)return btSend(escBL(b,pw())).catch(btErr);$('tk').innerHTML=`<h2>BON DE LIVRAISON</h2><p class="c">${esc(b.numero)}<br>${dt(b.created_at)}</p><p>Vendeur : ${esc(b.vendeur)}${b.client?'<br>Client : '+esc(b.client):''}${ci(b).matricule_fiscal?'<br>MF : '+esc(ci(b).matricule_fiscal):''}${ci(b).adresse?'<br>Adresse : '+esc(ci(b).adresse):''}<br>Paiement : ${MT[b.mode_paiement]||''}</p><hr>`
+  +b.lignes.map(l=>`<div><b>${esc(l.designation)}</b><div class="r"><span>${l.qte} x ${r3(l.prix).toFixed(3)}</span><span>${r3(l.total).toFixed(3)}</span></div></div>`).join('')
+  +`<hr><div class="r t"><span>TOTAL</span><span>${fmt(b.total)}</span></div>${b.notes?'<p>'+esc(b.notes)+'</p>':''}<hr><p class="c">Merci de votre visite<br>${esc(FOOTER)}</p>`;pr()}
+
+// ── Journal de vente ──
+let J=null;
+const ymd=d=>d.toLocaleDateString('fr-CA'),fd=x=>x.split('-').reverse().join('/'),S=(l,f)=>l.reduce((a,x)=>a+Number(f(x)||0),0),MX={especes:'Espèces',cheque:'Chèque',credit:'Crédit'};
+const fm=(v,k)=>k==='n'?String(r3(v)):k==='p'?Number(v).toFixed(2)+' %':k==='d'?String(v??''):fmt(v);
+async function loadJournal(){const a=$('jd1'),b=$('jd2');if(!a.value)a.value=b.value=ymd(new Date());if(a.value>b.value)[a.value,b.value]=[b.value,a.value];
+  const f=new Date(a.value+'T00:00:00').toISOString(),t=new Date(b.value+'T23:59:59.999').toISOString();
+  const pg=async tb=>{let r=[],i=0;for(;;){const d=await rd(sb.from(tb).select('*').gte('created_at',f).lte('created_at',t).order('created_at').range(i,i+999));r=r.concat(d);if(d.length<1000)return r;i+=1000}};
+  try{J={bl:await pg('bl'),rg:await pg('reglements'),from:a.value,to:b.value};renderJ()}
+  catch(e){if(!isNet(e))return toast(e.message,1);const inR=x=>{const d=ymd(new Date(x.created_at));return d>=a.value&&d<=b.value};
+    J={bl:bls.filter(inR).slice().reverse(),rg:QUEUE.filter(q=>q.type==='reg').map(q=>q.row).filter(inR),from:a.value,to:b.value,local:true};renderJ()}}
+function jp(d){const n=new Date(),a=$('jd1'),b=$('jd2'),x=new Date();if(d.d==='1')x.setDate(n.getDate()-1);
+  a.value=d.d==='7'?ymd(new Date(n.getFullYear(),n.getMonth(),n.getDate()-6)):d.d==='m'?ymd(new Date(n.getFullYear(),n.getMonth(),1)):ymd(x);b.value=d.d==='1'?ymd(x):ymd(n);loadJournal()}
+function jstat(bl,rg){const o={nb:bl.length,total:S(bl,x=>x.total),marge:S(bl,x=>x.marge),qte:S(bl,x=>S(x.lignes,l=>l.qte))},by=m=>bl.filter(x=>x.mode_paiement===m),rm=m=>rg.filter(x=>x.mode===m);
+  for(const m of['especes','cheque','credit'])o[m]=S(by(m),x=>x.total);
+  o.re=S(rm('especes'),x=>x.montant);o.rc=S(rm('cheque'),x=>x.montant);o.regl=o.re+o.rc;o.ee=o.especes+o.re;o.ec=o.cheque+o.rc;o.enc=o.ee+o.ec;
+  o.cout=o.total-o.marge;o.tm=o.cout>0?o.marge/o.cout*100:0;o.tq=o.total>0?o.marge/o.total*100:0;o.pm=o.nb?o.total/o.nb:0;return o}
+function jdays(){const m=new Map(),add=(k,t,x)=>{if(!m.has(k))m.set(k,{bl:[],rg:[]});m.get(k)[t].push(x)};
+  J.bl.forEach(x=>add(ymd(new Date(x.created_at)),'bl',x));J.rg.forEach(x=>add(ymd(new Date(x.created_at)),'rg',x));
+  return [...m.entries()].sort((a,b)=>a[0]<b[0]?-1:1).map(([k,v])=>[k,jstat(v.bl,v.rg)])}
+function jarts(){const m=new Map();J.bl.forEach(b=>b.lignes.forEach(l=>{const e=m.get(l.designation)||{n:l.designation,ref:l.reference,qte:0,ca:0,marge:0};e.qte+=Number(l.qte);e.ca+=Number(l.total);e.marge+=(l.prix-(l.pa||0))*l.qte;m.set(l.designation,e)}));return [...m.values()].sort((a,b)=>b.ca-a.ca)}
+function jvend(){const m=new Map();J.bl.forEach(b=>{const k=b.vendeur||'—',e=m.get(k)||{n:k,nb:0,total:0};e.nb++;e.total+=Number(b.total);m.set(k,e)});return [...m.values()]}
+const jsum=o=>[['Nombre de BL',o.nb,'n'],['Total des ventes',o.total],['Panier moyen',o.pm],["Quantité d'articles vendus",o.qte,'n'],['Ventes en espèces',o.especes],['Ventes par chèque',o.cheque],['Ventes à crédit',o.credit],['Règlements reçus (espèces)',o.re],['Règlements reçus (chèques)',o.rc],['TOTAL ESPÈCES ENCAISSÉ',o.ee],['TOTAL CHÈQUES ENCAISSÉ',o.ec],['TOTAL ENCAISSÉ',o.enc],
+  ...(isAdmin()?[["Coût d'achat des ventes",o.cout],['Marge totale',o.marge],['Taux de marge sur achat',o.tm,'p'],['Taux de marque sur vente',o.tq,'p']]:[])];
+function jsecs(){const o=jstat(J.bl,J.rg),A=isAdmin(),m=A?'m':'',row=(k,x)=>[k,x.nb,x.total,x.especes,x.cheque,x.credit,x.regl,x.enc,...(A?[x.marge]:[])],cn=id=>clients.find(c=>c.id===id)?.nom||'';
+  return [
+  {t:'Par jour',head:['Date','BL','Ventes','Espèces','Chèques','Crédit','Règlements','Encaissé',...(A?['Marge']:[])],k:'dnmmmmmm'+m,rows:[...jdays().map(([k,x])=>row(fd(k),x)),row('TOTAL',o)]},
+  {t:'Articles vendus',head:['Article','Réf.','Qté','Ventes',...(A?['Marge']:[])],k:'ddnm'+m,rows:jarts().map(a=>[a.n,a.ref||'',a.qte,a.ca,...(A?[a.marge]:[])])},
+  {t:'Par vendeur',head:['Vendeur','BL','Ventes'],k:'dnm',rows:jvend().map(v=>[v.n,v.nb,v.total])},
+  {t:'Bons de livraison',lim:1,head:['N°','Date','Client','Vendeur','Paiement','Total',...(A?['Marge']:[])],k:'dddddm'+m,rows:J.bl.map(b=>[b.numero,dt(b.created_at),b.client||'Comptoir',b.vendeur||'',MX[b.mode_paiement]||'',b.total,...(A?[b.marge]:[])])},
+  {t:'Règlements clients',head:['Date','Client','Mode','Note','Montant'],k:'ddddm',rows:J.rg.map(r=>[dt(r.created_at),cn(r.client_id),MX[r.mode]||r.mode,r.note||'',r.montant])},
+  {t:'Détail articles',x:1,head:['N° BL','Date','Article','Qté','Prix','Total'],k:'dddnmm',rows:J.bl.flatMap(b=>b.lignes.map(l=>[b.numero,dt(b.created_at),l.designation,l.qte,l.prix,l.total]))}]}
+function renderJ(){if(!J)return;
+  $('jr').innerHTML=(J.local?'<p class="mut" style="color:#b45309">⚠️ Hors ligne : données locales (derniers BL chargés et ventes en attente).</p>':'')+`<p class="mut">Période : du ${fd(J.from)} au ${fd(J.to)}</p><div class="kp">${jsum(jstat(J.bl,J.rg)).map(([l,v,t])=>`<div>${l}<b>${fm(v,t)}</b></div>`).join('')}</div>`
+  +jsecs().filter(s=>!s.x).map(s=>`<div class="card" style="padding:10px"><h3>${s.t} <small>(${s.rows.length})</small></h3>${table(s.head,(s.lim?s.rows.slice(0,200):s.rows).map(r=>`<tr${r[0]==='TOTAL'?' style="font-weight:700;background:#f8f9fa"':''}>${r.map((v,i)=>`<td class="${s.k[i]==='d'?'':'nw'}">${s.k[i]==='d'?esc(v):fm(v,s.k[i])}</td>`).join('')}</tr>`))}</div>`).join('')}
+function jx(){if(!J)return toast("Ouvrez d'abord le journal",1);const wb=XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet([['JOURNAL DES VENTES'],['Du '+fd(J.from)+' au '+fd(J.to)],[],...jsum(jstat(J.bl,J.rg)).map(([l,v])=>[l,r3(v)])]),'Résumé');
+  jsecs().forEach(s=>XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet([s.head,...s.rows]),s.t));XLSX.writeFile(wb,`Journal_${J.from}_${J.to}.xlsx`)}
+function jf(){if(!J)return toast("Ouvrez d'abord le journal",1);const {jsPDF}=window.jspdf,d=new jsPDF(),H={fillColor:[30,45,61]};
+  d.setFontSize(16);d.text('JOURNAL DES VENTES',14,16);d.setFontSize(10);d.text('Période : du '+fd(J.from)+' au '+fd(J.to),14,23);
+  d.autoTable({startY:28,head:[['Indicateur','Valeur']],body:jsum(jstat(J.bl,J.rg)).map(([l,v,t])=>[l,fm(v,t)]),styles:{fontSize:9},headStyles:H,columnStyles:{1:{halign:'right'}}});
+  jsecs().filter(s=>!s.x).forEach(s=>{let y=d.lastAutoTable.finalY+10;if(y>265){d.addPage();y=16}d.setFontSize(11);d.text(s.t,14,y);
+    d.autoTable({startY:y+3,head:[s.head],body:s.rows.map(r=>r.map((v,i)=>fm(v,s.k[i]))),styles:{fontSize:8},headStyles:H,columnStyles:Object.fromEntries([...s.k].map((c,i)=>[i,{halign:c==='d'?'left':'right'}])),didParseCell:h=>{if(h.section==='body'&&h.row.raw[0]==='TOTAL')h.cell.styles.fontStyle='bold'}})});
+  d.save(`Journal_${J.from}_${J.to}.pdf`)}
+function jc(){if(!J)return toast("Ouvrez d'abord le journal",1);if(!J.bl.length)return toast('Aucun BL sur cette période',1);
+  const {jsPDF}=window.jspdf,d=new jsPDF();
+  J.bl.forEach((b,i)=>{if(i)d.addPage();const c=clients.find(x=>x.id===b.client_id);
+    d.setFontSize(18);d.text('BON DE LIVRAISON',14,18);d.setFontSize(10);d.text('(copie)',14,24);
+    d.setFontSize(11);d.text('N° '+b.numero,14,32);d.text('Date : '+dt(b.created_at),14,38);d.text('Vendeur : '+(b.vendeur||''),14,44);
+    d.text('Client : '+(b.client||'Comptoir'),115,32);let y=38;
+    if(c?.telephone){d.text('Tél : '+c.telephone,115,y);y+=6}if(c?.matricule_fiscal){d.text('MF : '+c.matricule_fiscal,115,y);y+=6}if(c?.adresse){const ad=d.splitTextToSize('Adresse : '+c.adresse,80);d.text(ad,115,y);y+=6*ad.length}d.text('Paiement : '+(MX[b.mode_paiement]||''),115,y);
+    d.autoTable({startY:Math.max(52,y+6),head:[['Article','Réf.','Qté','Prix unit.','Total']],body:b.lignes.map(l=>[l.designation,l.reference||'',r3(l.qte),r3(l.prix).toFixed(3),r3(l.total).toFixed(3)]),styles:{fontSize:9},headStyles:{fillColor:[30,45,61]},columnStyles:{2:{halign:'right'},3:{halign:'right'},4:{halign:'right'}}});
+    y=d.lastAutoTable.finalY+9;if(y>270){d.addPage();y=20}d.setFontSize(13);d.text('TOTAL : '+fmt(b.total),196,y,{align:'right'});
+    if(b.notes){d.setFontSize(9);d.text(d.splitTextToSize('Notes : '+b.notes,180),14,y+8)}});
+  const n=d.getNumberOfPages();for(let p=1;p<=n;p++){d.setPage(p);d.setFontSize(8);d.text(FOOTER+'  ·  Page '+p+'/'+n,105,290,{align:'center'})}
+  d.save(`Copies_BL_${J.from}_${J.to}.pdf`)}
+function jtick(w){if(!w&&!BT?.dev&&btSaved())return btRestore().then(()=>jtick(1));if(BT?.dev&&J)return btSend(escJ(jstat(J.bl,J.rg),pw())).catch(btErr);if(!J)return toast("Ouvrez d'abord le journal",1);const o=jstat(J.bl,J.rg),L=(a,b)=>`<div class="r"><span>${a}</span><span>${b}</span></div>`;
+  $('tk').innerHTML=`<h2>JOURNAL DES VENTES</h2><p class="c">Du ${fd(J.from)} au ${fd(J.to)}<br>Imprimé le ${dt(new Date())}</p><hr>`+L('Nombre de BL',o.nb)+L('Total ventes',fmt(o.total))+'<hr>'
+  +L('Ventes espèces',fmt(o.especes))+L('Ventes chèque',fmt(o.cheque))+L('Ventes crédit',fmt(o.credit))+L('Règl. espèces',fmt(o.re))+L('Règl. chèque',fmt(o.rc))+'<hr>'
+  +L('Espèces encaissé',fmt(o.ee))+L('Chèques encaissé',fmt(o.ec))+`<div class="r t"><span>ENCAISSÉ</span><span>${fmt(o.enc)}</span></div>`+(isAdmin()?'<hr>'+L('Marge',fmt(o.marge)):'');pr()}
+
+// ── Scan QR code / code-barres ──
+let QR=null;
+function qrStop(){$('sc').hidden=true;if(QR){const q=QR;QR=null;q.stop().then(()=>q.clear()).catch(()=>{})}}
+function scan(d){if(!window.Html5Qrcode)return toast("Scanner indisponible : librairie non chargée",1);$('sc').hidden=false;
+  QR=new Html5Qrcode('qr',{verbose:false});
+  QR.start({facingMode:'environment'},{fps:10,qrbox:{width:250,height:170},experimentalFeatures:{useBarCodeDetectorIfSupported:true}},txt=>{qrStop();onScan(txt,d.t)},()=>{})
+    .catch(e=>{qrStop();toast('Caméra indisponible : '+(e.message||e)+' (HTTPS et autorisation caméra requis)',1)})}
+function onScan(code,t){code=String(code).trim();navigator.vibrate?.(60);const i=$(t);i.value=code;
+  if(t==='cl'){const n=norm(code),c=clients.find(x=>[x.code,x.telephone,x.matricule_fiscal,x.nom].some(v=>v&&norm(v)===n));i.value=c?c.nom:'';cinfo();return toast(c?'Client : '+c.nom:'Aucun client trouvé pour le code '+code,!c)}
+  if(t==='aq'){const a=articles.find(x=>norm(x.reference)===norm(code));if(a){i.value='';pickA({id:a.id});return toast('Ajouté : '+a.designation)}dd();return toast('Code non trouvé : '+code,1)}
+  if(t==='f_reference'){const e=articles.find(x=>norm(x.reference)===norm(code));if(e&&$('f_designation').value.trim()!==e.designation)toast('Attention : ce code existe déjà pour « '+e.designation+' »',1)}
+  i.dispatchEvent(new Event('input'))}
+
+// ── Clients, soldes, règlements ──
+let debtOnly=false;
+function renderCli(){$('cdb').textContent=debtOnly?'👥 Tous les clients':'💳 Clients avec solde';const l=(debtOnly?clients.filter(c=>c.solde>0.0005).sort((a,b)=>b.solde-a.solde):clients).filter(c=>match((c.code||'')+' '+c.nom+' '+(c.telephone||'')+' '+(c.matricule_fiscal||''),$('cq').value)),d=clients.reduce((s,c)=>s+Number(c.solde),0);
+  $('cc').textContent=`(${clients.length}) · crédits dus : ${fmt(d)}`;$('cls').innerHTML=clients.map(c=>`<option value="${esc(c.nom)}">`).join('');
+  $('cli').innerHTML=table(['Code','Nom','Solde','','Mat. fiscal','Tél.'],l.slice(0,100).map(c=>`<tr><td class="mono">${esc(c.code)}</td><td><b>${esc(c.nom)}</b>${c.adresse?`<br><small>${esc(c.adresse)}</small>`:''}</td><td class="nw ${c.solde>0?'neg':'pr'}">${fmt(c.solde)}</td><td class="nw"><button class="btn g sm" data-act="reg" data-id="${c.id}">💰 Règlement</button> <button class="btn s sm" data-act="editC" data-id="${c.id}">✏️</button> <button class="btn r sm adm" data-act="delC" data-id="${c.id}">🗑️</button></td><td class="mono">${esc(c.matricule_fiscal)}</td><td class="nw">${esc(c.telephone)}</td></tr>`))}
+function cinfo(){const n=norm($('cl').value.trim()),c=n&&clients.find(x=>norm(x.nom)===n);
+  $('ci').innerHTML=c?`Client existant · solde : <b class="${c.solde>0?'neg':''}">${fmt(c.solde)}</b>`:n?'Nouveau client : il sera créé à la validation du BL.':''}
+const CF=[['code','Code'],['nom','Nom *'],['telephone','Téléphone'],['matricule_fiscal','Matricule fiscal'],['adresse','Adresse']];
+function cliModal(c){modal(c?'Fiche client':'Nouveau client',CF.map(([k,l])=>`<div class="fg"><label>${l}</label><input id="c_${k}" value="${esc(c?.[k]??'')}"></div>`).join(''),async()=>{
+  const d={};CF.forEach(([k])=>d[k]=$('c_'+k).value.trim());if(!d.nom)return toast('Le nom est obligatoire',1);
+  const {error}=await(c?sb.from('clients').update(d).eq('id',c.id):sb.from('clients').insert(d));
+  if(error)return toast(error.code==='23505'?'Ce client existe déjà':error.message,1);closeModal();toast('Enregistré');loadAll()})}
+function regModal(c){modal('Règlement — '+c.nom,`<p class="mut">Solde actuel : <b>${fmt(c.solde)}</b></p><div class="fg"><label>Montant reçu (DT)</label><input id="r_m" type="number" step="0.001" value="${c.solde>0?r3(c.solde):''}"></div><div class="fg"><label>Mode</label><select id="r_t"><option value="especes">💵 Espèces</option><option value="cheque">🧾 Chèque</option></select></div><div class="fg"><label>Note (n° de chèque…)</label><input id="r_n"></div>`,async()=>{
+  const m=num($('r_m').value);if(!(m>0))return toast('Montant invalide',1);if(m>c.solde&&!confirm('Le montant dépasse le solde du client. Continuer ?'))return;
+  const row={id:uid(),client_id:c.id,montant:m,mode:$('r_t').value,note:$('r_n').value.trim(),vendeur:me.nom,created_at:new Date().toISOString()};
+  let error=null;if(!navigator.onLine)error={message:'offline'};else error=(await sb.from('reglements').insert(row)).error;
+  if(error){if(!isNet(error))return toast(error.message,1);if(String(c.id).startsWith('loc-'))return toast('Client non synchronisé : réessayez après la synchronisation',1);
+    QUEUE.push({type:'reg',row});c.solde=r3(Number(c.solde)-m);await saveQ();await saveLocal();closeModal();toast('Hors ligne : règlement enregistré, il sera synchronisé');netUI();return renderCli()}
+  closeModal();toast('Règlement enregistré');loadAll()})}
+async function delC(id){if(!confirm('Supprimer ce client et ses règlements ? Ses BL sont conservés.'))return;const {error}=await sb.from('clients').delete().eq('id',id);if(error)return toast(error.message,1);toast('Supprimé');loadAll()}
+
+// ── Articles (admin) ──
+const FL=[['reference','Référence'],['designation','Désignation *'],['prix_achat',"Prix d'achat"],['marge_pct',"Marge % (sur prix d'achat)"],['prix_vente','Prix de vente *'],['stock','Stock']];
+function formModal(item){modal(item?'Modifier':'Nouvel article',FL.map(([k,l])=>`<div class="fg"><label>${l}</label>${k==='reference'?'<div style="display:flex;gap:6px">':''}<input id="f_${k}" type="${['reference','designation'].includes(k)?'text':'number'}" step="any" value="${esc(item?.[k]??'')}">${k==='reference'?'<button class="btn g" type="button" data-act="scan" data-t="f_reference" title="Scanner le code-barres">📷</button></div>':''}</div>`).join('')+'<p class="mut" id="fm"></p>',async()=>{
+    const d={};FL.forEach(([k])=>d[k]=$('f_'+k).value.trim());['prix_achat','prix_vente','stock'].forEach(k=>d[k]=num(d[k]));delete d.marge_pct;
+    if(!d.designation||!(d.prix_vente>=0))return toast('Désignation et prix de vente obligatoires',1);
+    const {error}=await(item?sb.from('articles').update(d).eq('id',item.id):sb.from('articles').insert(d));
+    if(error)return toast(error.message,1);closeModal();toast('Enregistré');loadAll()});
+  const pa=()=>num($('f_prix_achat').value),pv=()=>num($('f_prix_vente').value),pm=()=>num($('f_marge_pct').value),
+    info=()=>{const a=pa(),v=pv(),m=v-a;$('fm').textContent='Marge : '+fmt(m)+(a>0?' · sur achat : '+(m/a*100).toFixed(2)+' %':'')+(v>0?' · taux de marque (sur vente) : '+(m/v*100).toFixed(2)+' %':'')},
+    fromV=()=>{$('f_marge_pct').value=pa()>0&&$('f_prix_vente').value!==''?((pv()-pa())/pa()*100).toFixed(2):''},
+    fromP=()=>{$('f_prix_vente').value=r3(pa()*(1+pm()/100))};
+  $('f_prix_achat').oninput=()=>{$('f_marge_pct').value!==''?fromP():fromV();info()};
+  $('f_marge_pct').oninput=()=>{if($('f_marge_pct').value!=='')fromP();info()};
+  $('f_prix_vente').oninput=()=>{fromV();info()};fromV();info()}
+async function del(id){if(!confirm('Supprimer cet article ?'))return;const {error}=await sb.from('articles').delete().eq('id',id);if(error)return toast(error.message,1);toast('Supprimé');loadAll()}
+const g=(r,...k)=>{for(const x of k)if(r[x]!==undefined&&r[x]!=='')return r[x]};
+const CFG={articles:{base:{reference:'',designation:'',prix_achat:0,prix_vente:0,stock:0},key:r=>norm(r.reference)||norm(r.designation),
+  map:r=>{const x={reference:g(r,'reference','ref','code'),designation:g(r,'designation','libelle','article')},pa=g(r,'prix_achat','prix_d_achat','achat','pa'),pv=g(r,'prix_vente','prix_de_vente','vente','pv','prix_ttc','prix','price'),st=g(r,'stock','quantite','qte');
+    if(pa!==undefined)x.prix_achat=num(pa);if(pv!==undefined)x.prix_vente=num(pv);if(st!==undefined)x.stock=num(st);return x},ok:x=>x.designation},
+  clients:{base:{code:'',nom:'',telephone:'',matricule_fiscal:'',adresse:''},key:r=>norm(r.nom),
+  map:r=>({code:g(r,'code'),nom:g(r,'nom','client','raison_sociale'),telephone:g(r,'telephone','tel','gsm'),matricule_fiscal:g(r,'matricule_fiscal','matricule','mf','m_f'),adresse:g(r,'adresse')}),ok:x=>x.nom}};
+async function importFile(t,file){const C=CFG[t],wb=XLSX.read(await file.arrayBuffer(),{type:'array'}),
+  rows=XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]],{defval:''}).map(r=>Object.fromEntries(Object.entries(r).map(([k,v])=>[norm(k).trim().replace(/[\s'.]+/g,'_'),String(v).trim()]))),
+  ex=new Map((t==='articles'?articles:clients).map(x=>[C.key(x),x])),ins=[],upd=[],seen=new Set(),F=Object.keys(C.base);
+  for(const r of rows){const x=C.map(r);if(!C.ok(x))continue;const k=C.key(x);if(seen.has(k))continue;seen.add(k);const e=ex.get(k),
+    row={...C.base,...(e?Object.fromEntries(F.map(f=>[f,e[f]??C.base[f]])):{}),...Object.fromEntries(Object.entries(x).filter(([,v])=>v!==undefined&&v!==''))};
+    if(!e)ins.push(row);else if(!F.every(f=>String(e[f]??'')===String(row[f])))upd.push({...row,id:e.id})}
+  for(let i=0;i<ins.length;i+=500)await rd(sb.from(t).insert(ins.slice(i,i+500)));
+  for(let i=0;i<upd.length;i+=500)await rd(sb.from(t).upsert(upd.slice(i,i+500)));
+  toast(`${ins.length} ajouté(s), ${upd.length} mis à jour`);loadAll()}
+
+// ── Export Excel, sauvegarde et restauration ──
+function exportXlsx(t){const A=isAdmin(),rows=t==='articles'
+  ?articles.map(a=>({'Référence':a.reference,'Désignation':a.designation,...(A?{"Prix d'achat":Number(a.prix_achat)}:{}),'Prix de vente':Number(a.prix_vente),...(A?{'Marge DT':r3(a.prix_vente-a.prix_achat),'Marge %':a.prix_achat>0?+((a.prix_vente-a.prix_achat)/a.prix_achat*100).toFixed(2):''}:{}),'Stock':Number(a.stock)}))
+  :clients.map(c=>({'Code':c.code,'Nom':c.nom,'Téléphone':c.telephone,'Matricule fiscal':c.matricule_fiscal,'Adresse':c.adresse,'Solde':Number(c.solde)}));
+  if(!rows.length)return toast('Rien à exporter',1);const wb=XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet(rows),t==='articles'?'Articles':'Clients');XLSX.writeFile(wb,`${t}_${ymd(new Date())}.xlsx`)}
+function dl(name,blob){const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),8000)}
+async function backup(){try{toast('Sauvegarde en cours…');const T={};
+  for(const [t,o] of [['articles','designation'],['clients','nom'],['reglements','created_at'],['bl','created_at']])T[t]=await all(t,o);
+  dl('sauvegarde_'+new Date().toISOString().slice(0,16).replace(/[:T]/g,'-')+'.json',new Blob([JSON.stringify({app:'bl-vente',version:1,date:new Date().toISOString(),tables:T})],{type:'application/json'}));
+  toast(`Sauvegarde : ${T.articles.length} articles, ${T.clients.length} clients, ${T.bl.length} BL, ${T.reglements.length} règlements`)}catch(e){toast('Sauvegarde : '+e.message,1)}}
+async function restore(file){try{const j=JSON.parse(await file.text()),T=j.tables;if(j.app!=='bl-vente'||!T)throw new Error('Fichier de sauvegarde invalide');
+  if(!confirm(`Restaurer ${T.articles.length} articles, ${T.clients.length} clients, ${T.bl.length} BL et ${T.reglements.length} règlements ?\n\nLes articles et clients de la sauvegarde remplacent ceux qui existent déjà. Les BL et règlements déjà présents sont conservés.`))return;
+  toast('Restauration en cours…');const up=async(t,r,o)=>{for(let i=0;i<r.length;i+=300)await rd(sb.from(t).upsert(r.slice(i,i+300),o))};
+  await up('articles',T.articles);await up('clients',T.clients);await up('reglements',T.reglements,{onConflict:'id',ignoreDuplicates:true});
+  for(let i=0;i<T.bl.length;i+=100)await rd(sb.rpc('restaurer_bl',{p:T.bl.slice(i,i+100)}));
+  toast('Restauration terminée');loadAll()}catch(e){toast('Restauration : '+e.message,1)}}
+
+// ── Événements ──
+const A={logout:async()=>{if(QUEUE.length&&!confirm(QUEUE.length+' opération(s) pas encore synchronisée(s) restent sur cet appareil. Se déconnecter quand même ?'))return;try{await IDB.set('user',null)}catch{}try{await sb.auth.signOut()}catch{}location.reload()},
+  sync:async()=>{if(QUEUE.length){const n=await syncQueue();if(n&&!QUEUE.length)loadAll()}else loadAll()},refresh:async()=>{await loadAll();toast('Actualisé')},close:closeModal,
+  pickA,inc:d=>{panier[d.i].qte++;cart()},dec:d=>{if(--panier[d.i].qte<=0)panier.splice(d.i,1);cart()},rm:d=>{panier.splice(d.i,1);cart()},valider,cancel:reset,
+  edit:d=>formModal(articles.find(x=>x.id===d.id)),add:()=>formModal(),del:d=>del(d.id),
+  addC:()=>cliModal(),jp,jx,jf,jt:()=>jtick(),jc,btpair,scan,scanx:()=>qrStop(),cdebt:()=>{debtOnly=!debtOnly;renderCli()},xl:d=>exportXlsx(d.t),bak:backup,rest:()=>$('fr').click(),imp:d=>{$('fi').dataset.t=d.t;$('fi').click()},
+  delAll:async d=>{if(!confirm('Supprimer TOUS les '+d.t+' ? Cette action est définitive.'))return;const {error}=await sb.from(d.t).delete().not('id','is',null);if(error)return toast(error.message,1);toast('Supprimé');loadAll()},editC:d=>cliModal(clients.find(x=>x.id===d.id)),reg:d=>regModal(clients.find(x=>x.id===d.id)),delC:d=>delC(d.id),
+  tick:d=>tick(bls.find(c=>c.id===d.id)),editBL,delBL};
+document.addEventListener('click',e=>{if(!e.target.closest('.dd-wrap'))$('dda').hidden=true;
+  const t=e.target.closest('[data-go],[data-act]');if(!t)return;if(t.dataset.go)return go(t.dataset.go);A[t.dataset.act]?.(t.dataset)});
+document.addEventListener('change',async e=>{const t=e.target;
+  if(t.dataset.q!==undefined){panier[t.dataset.q].qte=Math.max(.001,parseFloat(t.value)||1);cart()}
+  if(t.dataset.p!==undefined){panier[t.dataset.p].prix=Math.max(0,parseFloat(t.value)||0);cart()}
+  if(t.id==='jd1'||t.id==='jd2')loadJournal();
+  if(t.dataset.u){const {error}=await sb.from('profiles').update({role:t.value}).eq('id',t.dataset.u);toast(error?error.message:'Rôle mis à jour',!!error)}
+  if(t.id==='fr'&&t.files[0]){await restore(t.files[0]);t.value=''}
+  if(t.id==='fi'&&t.files[0]){try{await importFile(t.dataset.t,t.files[0])}catch(x){toast('Import : '+x.message,1)}t.value=''}});
+$('mok').onclick=async()=>{$('mok').disabled=true;try{await okFn()}finally{$('mok').disabled=false}};
+$('ov').onclick=e=>{if(e.target===$('ov'))closeModal()};addEventListener('keydown',e=>{if(e.key==='Escape')closeModal()});
+$('tsz').value=tfs();$('pw').value=pw();$('pw').onchange=()=>{try{localStorage.pw=$('pw').value}catch{}};$('tsz').onchange=()=>{try{localStorage.tsz=$('tsz').value}catch{}};$('hs').oninput=renderHist;$('as').oninput=renderArt;$('cq').oninput=renderCli;$('cl').oninput=cinfo;$('aq').onkeydown=e=>{if(e.key!=='Enter')return;const a=articles.find(x=>norm(x.reference)===norm($('aq').value.trim()));if(a){e.preventDefault();$('aq').value='';$('dda').hidden=true;pickA({id:a.id})}};$('aq').oninput=$('aq').onfocus=dd;
+addEventListener('online',async()=>{NET=true;netUI();const n=await syncQueue();if(n&&!QUEUE.length)loadAll()});
+addEventListener('offline',()=>{NET=false;netUI()});
+setInterval(async()=>{if(QUEUE.length&&navigator.onLine){const n=await syncQueue();if(n&&!QUEUE.length)loadAll()}},60000);
+if('serviceWorker' in navigator)addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));
+</script></body></html>
