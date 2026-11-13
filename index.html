@@ -71,7 +71,7 @@ input,textarea,select{width:100%;padding:8px 10px;border:1.5px solid #e0e5ea;bor
 <div id="p_stk" class="page"><div class="card"><h3>📲 Entrée de stock (type PDA)</h3>
 <select id="smode"><option value="ajout">➕ Entrée de stock : les quantités s'ajoutent au stock</option><option value="inventaire">📋 Inventaire : les quantités remplacent le stock</option></select>
 <div style="display:flex;gap:6px;margin-top:8px"><div class="dd-wrap" style="flex:1"><input id="sq" placeholder="Scannez, ou cherchez par référence / désignation…" autocomplete="off"><div id="ddq" class="dd" hidden></div></div><button class="btn g" data-act="scan" data-t="stk" title="Scanner avec la caméra">📷</button></div>
-<p class="mut">Un scan cherche le code dans la référence (même partiellement). Vous pouvez aussi taper pour chercher par référence ou désignation, puis choisir l'article. Chaque ajout compte 1 unité : corrigez la quantité si besoin, puis validez (le stock n'est modifié qu'à la validation).</p>
+<p class="mut">Un scan cherche le code dans la référence (même partiellement). Vous pouvez aussi taper pour chercher par référence ou désignation, puis choisir l'article. Un scan ferme la caméra, ajoute l'article et vous place sur la quantité à saisir (Entrée pour revenir au scan suivant). Le stock n'est modifié qu'à la validation.</p>
 <div id="slines"></div><div class="tot" style="margin:10px 0"><span id="stl">0 article</span></div>
 <textarea id="snote" rows="2" placeholder="Note (fournisseur, n° de facture…)"></textarea>
 <button id="sbtn" class="btn g" data-act="svalid" style="width:100%;margin-top:10px;padding:13px" disabled></button></div></div>
@@ -227,7 +227,7 @@ async function btpair(){
 
 function tick(b,w){if(!w&&!BT?.dev&&btSaved())return btRestore().then(()=>tick(b,1));if(BT?.dev)return btSend(escBL(b,pw())).catch(btErr);$('tk').innerHTML=`<h2>BON DE LIVRAISON</h2><p class="c">${esc(b.numero)}<br>${dt(b.created_at)}</p><p>Vendeur : ${esc(b.vendeur)}${b.client?'<br>Client : '+esc(b.client):''}${ci(b).matricule_fiscal?'<br>MF : '+esc(ci(b).matricule_fiscal):''}${ci(b).adresse?'<br>Adresse : '+esc(ci(b).adresse):''}<br>Paiement : ${MT[b.mode_paiement]||''}</p><hr>`
   +b.lignes.map(l=>`<div><b>${esc(l.designation)}</b><div class="r"><span>${l.qte} x ${r3(l.prix).toFixed(3)}</span><span>${r3(l.total).toFixed(3)}</span></div></div>`).join('')
-  +`<hr><div class="r t"><span>TOTAL</span><span>${fmt(b.total)}</span></div>${b.notes?'<p>'+esc(b.notes)+'</p>':''}<hr><p class="c">Merci de votre visite<br>${esc(FOOTER)}</p>`;pr()}
+  +`<hr><div class="r t"><span>TOTAL</span><span>${fmt(b.total)}</span></div>${b.notes?'<p>'+esc(b.notes)+'</p>':''}<hr><p class="c">Merci de votre confiance<br>${esc(FOOTER)}</p>`;pr()}
 
 // ── Journal de vente ──
 let J=null;
@@ -283,7 +283,7 @@ function blPage(d,b){const c=clients.find(x=>x.id===b.client_id);
 function blFoot(d){const n=d.getNumberOfPages();for(let p=1;p<=n;p++){d.setPage(p);d.setFontSize(8);d.text(FOOTER+'  ·  Page '+p+'/'+n,105,290,{align:'center'})}}
 const blText=(b,w)=>{const B=x=>w?'*'+x+'*':x,L=[B('BON DE LIVRAISON'),'N° '+b.numero,'Date : '+dt(b.created_at),'Client : '+(b.client||'Comptoir'),'Paiement : '+(MX[b.mode_paiement]||''),'------------------------------',
   ...b.lignes.map(l=>l.designation+'\n   '+r3(l.qte)+' x '+r3(l.prix).toFixed(3)+' = '+r3(l.total).toFixed(3)),'------------------------------',B('TOTAL : '+fmt(b.total))];
-  if(b.notes)L.push(b.notes);L.push('','Merci de votre visite',FOOTER);return L.join('\n')};
+  if(b.notes)L.push(b.notes);L.push('','Merci de votre confiance',FOOTER);return L.join('\n')};
 const waNum=t=>{let n=String(t||'').split(/[\/,;]/)[0].replace(/\D/g,'');if(n.startsWith('00'))n=n.slice(2);if(n.length===8)n='216'+n;return n};
 function sendBL(d){const b=bls.find(x=>x.id===d.id),c=ci(b);
   modal('Envoyer '+b.numero,`<p class="mut">${esc(b.client||'Comptoir')}${c.telephone?' · '+esc(c.telephone):''}${c.email?' · '+esc(c.email):''}</p><div style="display:grid;gap:8px"><button class="btn g" data-act="sw" data-id="${b.id}">💬 WhatsApp (message)</button><button class="btn s" data-act="sm" data-id="${b.id}">✉️ E-mail</button><button class="btn s" data-act="sp" data-id="${b.id}">📎 Partager le PDF (WhatsApp, e-mail…)</button></div>`,closeModal);$('mok').hidden=true}
@@ -307,7 +307,7 @@ let QR=null;
 function qrStop(){$('sc').hidden=true;if(QR){const q=QR;QR=null;q.stop().then(()=>q.clear()).catch(()=>{})}}
 function scan(d){if(!window.Html5Qrcode)return toast("Scanner indisponible : librairie non chargée",1);$('sc').hidden=false;$('scn').textContent='';
   QR=new Html5Qrcode('qr',{verbose:false});
-  QR.start({facingMode:'environment'},{fps:10,qrbox:{width:250,height:170},experimentalFeatures:{useBarCodeDetectorIfSupported:true}},txt=>{if(d.t==='stk'){const n=Date.now();if(txt===lastScan.c&&n-lastScan.t<1500)return;lastScan={c:txt,t:n};return onScan(txt,'stk')}qrStop();onScan(txt,d.t)},()=>{})
+  QR.start({facingMode:'environment'},{fps:10,qrbox:{width:250,height:170},experimentalFeatures:{useBarCodeDetectorIfSupported:true}},txt=>{if(!QR)return;qrStop();onScan(txt,d.t)},()=>{})
     .catch(e=>{qrStop();toast('Caméra indisponible : '+(e.message||e)+' (HTTPS et autorisation caméra requis)',1)})}
 function onScan(code,t){code=String(code).trim();if(t==='stk')return stkAdd(code);navigator.vibrate?.(60);const i=$(t);i.value=code;
   if(t==='cl'){const n=norm(code),c=clients.find(x=>[x.code,x.telephone,x.matricule_fiscal,x.nom].some(v=>v&&norm(v)===n));i.value=c?c.nom:'';cinfo();return toast(c?'Client : '+c.nom:'Aucun client trouvé pour le code '+code,!c)}
@@ -394,8 +394,9 @@ async function restore(file){try{const j=JSON.parse(await file.text()),T=j.table
 let SL=[],lastScan={c:'',t:0};
 const beep=()=>{try{const a=new (window.AudioContext||window.webkitAudioContext)(),o=a.createOscillator();o.frequency.value=1000;o.connect(a.destination);o.start();setTimeout(()=>{o.stop();a.close()},90)}catch{}};
 const refFind=code=>{const n=norm(code).trim();if(!n)return [];const ex=articles.filter(x=>norm(x.reference).trim()===n);return ex.length?ex:articles.filter(x=>norm(x.reference).includes(n))};
-function stkPick(a){const l=SL.find(x=>x.id===a.id);if(l)l.qte++;else SL.unshift({id:a.id,reference:a.reference,designation:a.designation,qte:1});
-  beep();navigator.vibrate?.(40);$('scn').textContent='Dernier : '+a.designation+' (x'+SL.find(x=>x.id===a.id).qte+')';stkRender()}
+function stkPick(a){let l=SL.find(x=>x.id===a.id);const had=!!l;if(!l){l={id:a.id,reference:a.reference,designation:a.designation,qte:1};SL.unshift(l)}
+  beep();navigator.vibrate?.(40);stkRender();toast(had?'Déjà dans la liste : modifiez la quantité':'Ajouté : '+a.designation+' — saisissez la quantité');
+  setTimeout(()=>{const el=document.querySelector('[data-sq="'+SL.indexOf(l)+'"]');if(el){el.focus();el.select()}},60)}
 function sdd(list){const q=$('sq').value.trim(),l=list||(q?articles.filter(x=>match((x.reference||'')+' '+x.designation,q)).slice(0,40):[]);
   $('ddq').innerHTML=l.map(x=>`<div class="di" data-act="spick" data-id="${x.id}"><span><b>${esc(x.designation)}</b><br><small>${esc(x.reference)} · stock ${stk(x)}</small></span></div>`).join('');$('ddq').hidden=!l.length}
 function stkAdd(code,ask){code=String(code||'').trim();if(!code)return false;let l=refFind(code);
@@ -436,7 +437,7 @@ document.addEventListener('change',async e=>{const t=e.target;
   if(t.id==='fi'&&t.files[0]){try{await importFile(t.dataset.t,t.files[0])}catch(x){toast('Import : '+x.message,1)}t.value=''}});
 $('mok').onclick=async()=>{$('mok').disabled=true;try{await okFn()}finally{$('mok').disabled=false}};
 $('ov').onclick=e=>{if(e.target===$('ov'))closeModal()};addEventListener('keydown',e=>{if(e.key==='Escape')closeModal()});
-$('tsz').value=tfs();$('pw').value=pw();$('pw').onchange=()=>{try{localStorage.pw=$('pw').value}catch{}};$('tsz').onchange=()=>{try{localStorage.tsz=$('tsz').value}catch{}};$('hs').oninput=renderHist;$('as').oninput=renderArt;$('cq').oninput=renderCli;$('cl').oninput=cinfo;$('sq').onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();if(stkAdd($('sq').value,true)){$('sq').value='';$('ddq').hidden=true}}};$('sq').oninput=()=>sdd();$('smode').onchange=stkRender;$('aq').onkeydown=e=>{if(e.key!=='Enter')return;const l=refFind($('aq').value);if(l.length===1){e.preventDefault();$('aq').value='';$('dda').hidden=true;pickA({id:l[0].id})}};$('aq').oninput=$('aq').onfocus=dd;
+$('tsz').value=tfs();$('pw').value=pw();$('pw').onchange=()=>{try{localStorage.pw=$('pw').value}catch{}};$('tsz').onchange=()=>{try{localStorage.tsz=$('tsz').value}catch{}};$('hs').oninput=renderHist;$('as').oninput=renderArt;$('cq').oninput=renderCli;$('cl').oninput=cinfo;$('sq').onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();if(stkAdd($('sq').value,true)){$('sq').value='';$('ddq').hidden=true}}};$('sq').oninput=()=>sdd();document.addEventListener('keydown',e=>{if(e.key==='Enter'&&e.target.dataset?.sq!==undefined){e.preventDefault();$('sq').focus()}});$('smode').onchange=stkRender;$('aq').onkeydown=e=>{if(e.key!=='Enter')return;const l=refFind($('aq').value);if(l.length===1){e.preventDefault();$('aq').value='';$('dda').hidden=true;pickA({id:l[0].id})}};$('aq').oninput=$('aq').onfocus=dd;
 addEventListener('online',async()=>{NET=true;netUI();const n=await syncQueue();if(n&&!QUEUE.length)loadAll()});
 addEventListener('offline',()=>{NET=false;netUI()});
 setInterval(async()=>{if(QUEUE.length&&navigator.onLine){const n=await syncQueue();if(n&&!QUEUE.length)loadAll()}},60000);
