@@ -67,7 +67,7 @@ input,textarea,select{width:100%;padding:8px 10px;border:1.5px solid #e0e5ea;bor
 <div id="p_hist" class="page"><div class="card"><div class="bar"><h3>📋 Bons de livraison</h3><input id="hs" placeholder="🔍 N°, client, vendeur…" style="width:200px"><select id="tsz" style="width:auto" title="Taille du texte du ticket"><option value="12">Ticket : texte petit</option><option value="14">Ticket : texte normal</option><option value="16">Ticket : texte grand</option><option value="18">Ticket : texte très grand</option></select><select id="pw" style="width:auto" title="Largeur du ticket en Bluetooth direct"><option value="48">Bluetooth : 48 car. (80 mm)</option><option value="42">Bluetooth : 42 car.</option><option value="32">Bluetooth : 32 car. (58 mm)</option></select></div><div id="hist"></div></div></div>
 
 <div id="p_art" class="page"><div class="card"><div class="bar"><h3>📦 Articles <small id="ac"></small></h3><input id="as" placeholder="🔍 Réf. ou désignation…" style="width:200px"><button class="btn s sm" data-act="scan" data-t="as" title="Scanner un code">📷</button>
-<button class="btn s sm" data-act="xl" data-t="articles">📤 Excel</button><button class="btn s sm adm" data-act="imp" data-t="articles">📥 Importer</button><button class="btn g sm adm" data-act="add">➕ Nouveau</button></div><div id="art"></div><div class="adm" style="margin-top:12px"><button class="btn r sm" data-act="delAll" data-t="articles">🗑️ Supprimer tous les articles</button></div></div></div>
+<button class="btn s sm adm" data-act="gostk">📲 Entrée de stock</button><button class="btn s sm" data-act="xl" data-t="articles">📤 Excel</button><button class="btn s sm adm" data-act="imp" data-t="articles">📥 Importer</button><button class="btn g sm adm" data-act="add">➕ Nouveau</button></div><div id="art"></div><div class="adm" style="margin-top:12px"><button class="btn r sm" data-act="delAll" data-t="articles">🗑️ Supprimer tous les articles</button></div></div></div>
 <div id="p_stk" class="page"><div class="card"><h3>📲 Entrée de stock (type PDA)</h3>
 <select id="smode"><option value="ajout">➕ Entrée de stock : les quantités s'ajoutent au stock</option><option value="inventaire">📋 Inventaire : les quantités remplacent le stock</option></select>
 <div style="display:flex;gap:6px;margin-top:8px"><input id="sq" placeholder="Scannez ou saisissez le code…" autocomplete="off" style="flex:1"><button class="btn g" data-act="scan" data-t="stk" title="Scanner avec la caméra">📷</button></div>
@@ -141,7 +141,7 @@ async function start(u){
   me=data||await IDB.get('me').catch(()=>null)||{id:u.id,nom:u.email,role:'user'};if(data){IDB.set('me',me).catch(()=>{});IDB.set('user',{id:u.id,email:u.email}).catch(()=>{})}
   QUEUE=(await IDB.get('queue').catch(()=>null))||[];
   $('login').hidden=true;$('app').hidden=false;document.body.classList.toggle('admin',isAdmin());
-  $('who').textContent=me.nom+(isAdmin()?' · admin':'');btRestore();go('cmd');cart();await loadAll()}
+  $('who').textContent=me.nom+(isAdmin()?' · admin':' · utilisateur')+' · v7';btRestore();go('cmd');cart();await loadAll()}
 (async()=>{let r={};try{r=await sb.auth.getSession()}catch(e){r={error:e}}
   if(r.data?.session)return start(r.data.session.user);
   const u=await IDB.get('user').catch(()=>null);if(u&&(!navigator.onLine||isNet(r.error)))start(u)})();
@@ -415,7 +415,7 @@ const A={logout:async()=>{if(QUEUE.length&&!confirm(QUEUE.length+' opération(s)
   sync:async()=>{if(QUEUE.length){const n=await syncQueue();if(n&&!QUEUE.length)loadAll()}else loadAll()},refresh:async()=>{await loadAll();toast('Actualisé')},close:closeModal,
   pickA,inc:d=>{panier[d.i].qte++;cart()},dec:d=>{if(--panier[d.i].qte<=0)panier.splice(d.i,1);cart()},rm:d=>{panier.splice(d.i,1);cart()},valider,cancel:reset,
   edit:d=>formModal(articles.find(x=>x.id===d.id)),add:()=>formModal(),del:d=>del(d.id),
-  addC:()=>cliModal(),jp,jx,jf,jt:()=>jtick(),jc,btpair,scan,scanx:()=>qrStop(),send:sendBL,sw:sendWA,sm:sendMail,sp:sendPdf,svalid:stkValid,sinc:d=>{SL[d.i].qte++;stkRender()},sdec:d=>{SL[d.i].qte=Math.max(0,SL[d.i].qte-1);stkRender()},srm:d=>{SL.splice(d.i,1);stkRender()},cdebt:()=>{debtOnly=!debtOnly;renderCli()},xl:d=>exportXlsx(d.t),bak:backup,rest:()=>$('fr').click(),imp:d=>{$('fi').dataset.t=d.t;$('fi').click()},
+  addC:()=>cliModal(),jp,jx,jf,jt:()=>jtick(),jc,btpair,scan,scanx:()=>qrStop(),gostk:()=>go('stk'),send:sendBL,sw:sendWA,sm:sendMail,sp:sendPdf,svalid:stkValid,sinc:d=>{SL[d.i].qte++;stkRender()},sdec:d=>{SL[d.i].qte=Math.max(0,SL[d.i].qte-1);stkRender()},srm:d=>{SL.splice(d.i,1);stkRender()},cdebt:()=>{debtOnly=!debtOnly;renderCli()},xl:d=>exportXlsx(d.t),bak:backup,rest:()=>$('fr').click(),imp:d=>{$('fi').dataset.t=d.t;$('fi').click()},
   delAll:async d=>{if(!confirm('Supprimer TOUS les '+d.t+' ? Cette action est définitive.'))return;const {error}=await sb.from(d.t).delete().not('id','is',null);if(error)return toast(error.message,1);toast('Supprimé');loadAll()},editC:d=>cliModal(clients.find(x=>x.id===d.id)),reg:d=>regModal(clients.find(x=>x.id===d.id)),delC:d=>delC(d.id),
   tick:d=>tick(bls.find(c=>c.id===d.id)),editBL,delBL};
 document.addEventListener('click',e=>{if(!e.target.closest('.dd-wrap'))$('dda').hidden=true;

@@ -1,7 +1,7 @@
 // Service worker : mise en cache de l'application pour un fonctionnement hors ligne.
 // Les données (Supabase) ne passent jamais par ce cache : elles sont gérées par l'application.
-const V = 'bl-vente-v1';
-const SHELL = ['./', './index.html', './manifest.json'];
+const V = 'bl-vente-v3';
+const SHELL = ['./', './index.html', './manifest.json', './icon-192.png', './icon-512.png', './icon-maskable-512.png', './icon-180.png'];
 const CDN = [
   'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js',
   'https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js',
@@ -31,7 +31,21 @@ self.addEventListener('fetch', e => {
   if (r.method !== 'GET' || u.hostname.endsWith('.supabase.co')) return;
   const cdn = CDN.includes(r.url);
   if (!cdn && u.origin !== location.origin) return;
-  // Réponse immédiate depuis le cache, mise à jour en arrière-plan quand le réseau est disponible
+  // Page de l'application : toujours la version la plus récente si le réseau répond (4 s max), sinon la copie locale
+  if (!cdn && (r.mode === 'navigate' || u.pathname.endsWith('/') || u.pathname.endsWith('index.html'))) {
+    e.respondWith((async () => {
+      const c = await caches.open(V);
+      try {
+        const x = await Promise.race([fetch(r, { cache: 'no-cache' }), new Promise((_, j) => setTimeout(j, 4000))]);
+        if (x && x.ok) c.put('./index.html', x.clone());
+        return x;
+      } catch (err) {
+        return (await c.match('./index.html')) || (await c.match('./')) || Response.error();
+      }
+    })());
+    return;
+  }
+  // Autres fichiers : réponse immédiate depuis le cache, mise à jour en arrière-plan
   e.respondWith((async () => {
     const c = await caches.open(V);
     const hit = await c.match(r, { ignoreSearch: !cdn });
