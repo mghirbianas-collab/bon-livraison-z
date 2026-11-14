@@ -64,7 +64,7 @@ input,textarea,select{width:100%;padding:8px 10px;border:1.5px solid #e0e5ea;bor
 <div class="adm mut" id="mg"></div>
 <button id="vbtn" class="btn g" style="width:100%;margin-top:10px;padding:13px" data-act="valider" disabled></button></div>
 
-<div id="p_hist" class="page"><div class="card"><div class="bar"><h3>📋 Bons de livraison</h3><input id="hs" placeholder="🔍 N°, client, vendeur…" style="width:200px"><select id="tsz" style="width:auto" title="Taille du texte du ticket"><option value="12">Ticket : texte petit</option><option value="14">Ticket : texte normal</option><option value="16">Ticket : texte grand</option><option value="18">Ticket : texte très grand</option></select><select id="pw" style="width:auto" title="Largeur du ticket en Bluetooth direct"><option value="48">Bluetooth : 48 car. (80 mm)</option><option value="42">Bluetooth : 42 car.</option><option value="32">Bluetooth : 32 car. (58 mm)</option></select></div><div id="hist"></div></div></div>
+<div id="p_hist" class="page"><div class="card"><div class="bar"><h3>📋 Bons de livraison</h3><input id="hs" placeholder="🔍 N°, client, vendeur…" style="width:200px"><select id="tsz" style="width:auto" title="Taille du texte du ticket"><option value="12">Ticket : texte petit</option><option value="14">Ticket : texte normal</option><option value="16">Ticket : texte grand</option><option value="18">Ticket : texte très grand</option></select><select id="pw" style="width:auto" title="Largeur du ticket (Bluetooth direct et RawBT)"><option value="48">Largeur : 48 car. (80 mm)</option><option value="42">Largeur : 42 car.</option><option value="32">Largeur : 32 car. (58 mm)</option></select><select id="pm" style="width:auto" title="Mode d'impression"><option value="web">Impression : navigateur</option><option value="rawbt">Impression : RawBT (ESC/POS)</option></select></div><div id="hist"></div></div></div>
 
 <div id="p_art" class="page"><div class="card"><div class="bar"><h3>📦 Articles <small id="ac"></small></h3><input id="as" placeholder="🔍 Réf. ou désignation…" style="width:200px"><button class="btn s sm" data-act="scan" data-t="as" title="Scanner un code">📷</button>
 <button class="btn s sm adm" data-act="gostk">📲 Entrée de stock</button><button class="btn s sm" data-act="xl" data-t="articles">📤 Excel</button><button class="btn s sm adm" data-act="imp" data-t="articles">📥 Importer</button><button class="btn g sm adm" data-act="add">➕ Nouveau</button></div><div id="art"></div><div class="adm" style="margin-top:12px"><button class="btn r sm" data-act="delAll" data-t="articles">🗑️ Supprimer tous les articles</button></div></div></div>
@@ -195,9 +195,10 @@ async function delBL(d){if(!navigator.onLine||bls.find(x=>x.id===d.id)?.pending)
 // ── Ticket (imprimante thermique 80 mm) ──
 const tfs=()=>{try{return localStorage.tsz||14}catch{return 14}},pr=()=>{$('tk').style.fontSize=tfs()+'px';setTimeout(()=>window.print(),150)};
 // ── Impression directe Bluetooth (ESC/POS, imprimantes Bluetooth LE) ──
-let BT=null;const ci=b=>clients.find(c=>c.id===b.client_id)||{},btSaved=()=>{try{return localStorage.btok==='1'}catch{return false}};
+let BT=null,btBusy=false;const ci=b=>clients.find(c=>c.id===b.client_id)||{},btSaved=()=>{try{return localStorage.btok==='1'}catch{return false}};
 const BTS=[0x18f0,0xff00,0xffe0,0xfee7,0xae30,'49535343-fe7d-4ae5-8fa9-9fafd205e455','e7810a71-73ae-499d-8c15-faa9aef0c3f2'];
-const pw=()=>{try{return +localStorage.pw||48}catch{return 48}};
+const pw=()=>{try{return +localStorage.pw||48}catch{return 48}},pmode=()=>{try{return localStorage.pm||'web'}catch{return 'web'}};
+function rawbt(b){let bin='';for(let i=0;i<b.length;i+=0x8000)bin+=String.fromCharCode.apply(null,b.subarray(i,i+0x8000));location.href='intent:base64,'+btoa(bin)+'#Intent;scheme=rawbt;package=ru.a402d.rawbtprinter;end;'}
 const CP={'é':130,'è':138,'à':133,'ç':135,'ê':136,'â':131,'î':140,'ô':147,'û':150,'ù':151,'ë':137,'ï':139,'ü':129,'ö':148,'ä':132,'É':144,'Ç':128,'Ä':142,'Ö':153,'Ü':154,'°':248};
 function enc(t){const o=[];for(const ch of String(t??'').normalize('NFC').replace(/©/g,'(c)').replace(/[—–]/g,'-').replace(/[’‘]/g,"'").replace(/·/g,'-').replace(/œ/g,'oe')){const c=ch.charCodeAt(0);if(c<128)o.push(c);else if(CP[ch])o.push(CP[ch]);else{const b=ch.normalize('NFD').charCodeAt(0);o.push(b<128?b:63)}}return o}
 const wrap=(t,w)=>{const r=[];let s=String(t??'').normalize('NFC');while(s.length>w){let i=s.lastIndexOf(' ',w);if(i<=0)i=w;r.push(s.slice(0,i));s=s.slice(i).trimStart()}r.push(s);return r};
@@ -217,15 +218,16 @@ async function btConnect(force){
   const dev=!force&&BT?.dev?BT.dev:await navigator.bluetooth.requestDevice({acceptAllDevices:true,optionalServices:BTS}),srv=await dev.gatt.connect();let ch=null;
   for(const s of await srv.getPrimaryServices()){if(/^0000180[01]-/.test(s.uuid))continue;for(const c of await s.getCharacteristics())if(c.properties.write||c.properties.writeWithoutResponse){ch=c;break}if(ch)break}
   if(!ch)throw new Error("Aucun canal d'écriture trouvé : cette imprimante n'est peut-être pas en Bluetooth LE");
-  BT={dev,ch};return ch}
-async function btSend(b){const ch=await btConnect(),nr=!ch.properties.write;
-  for(let i=0;i<b.length;i+=20){const p=b.slice(i,i+20);await(nr?ch.writeValueWithoutResponse(p):ch.writeValue(p));await new Promise(r=>setTimeout(r,25))}}
+  if(!dev._bl){dev._bl=1;dev.addEventListener('gattserverdisconnected',()=>{if(BT)BT.ch=null;$('btb').classList.remove('on')})}
+  BT={dev,ch};$('btb').classList.add('on');return ch}
+async function btSend(b){btBusy=true;try{const ch=await btConnect(),nr=!ch.properties.write;
+  for(let i=0;i<b.length;i+=20){const p=b.slice(i,i+20);await(nr?ch.writeValueWithoutResponse(p):ch.writeValue(p));await new Promise(r=>setTimeout(r,25))}}finally{btBusy=false}}
 const btErr=e=>{if(e.name!=='NotFoundError')toast('Bluetooth : '+(e.message||e),1)};
 async function btpair(){
   if(BT?.dev){if(!confirm("Imprimante connectée ("+(BT.dev.name||'Bluetooth')+"). La déconnecter et revenir à l'impression par le navigateur ?"))return;try{BT.dev.gatt.disconnect()}catch{}BT=null;try{localStorage.removeItem('btok')}catch{}$('btb').classList.remove('on');return toast("Retour à l'impression par le navigateur")}
   try{await btConnect(true);try{localStorage.btok='1';localStorage.btname=BT.dev.name||''}catch{}$('btb').classList.add('on');toast('Imprimante connectée : '+(BT.dev.name||''));await btSend(escp(pw(),({T,C})=>{C([27,97,1]);T('Imprimante connectee');T(BT.dev.name||'')}))}catch(e){BT=null;btErr(e)}}
 
-function tick(b,w){if(!w&&!BT?.dev&&btSaved())return btRestore().then(()=>tick(b,1));if(BT?.dev)return btSend(escBL(b,pw())).catch(btErr);$('tk').innerHTML=`<h2>BON DE LIVRAISON</h2><p class="c">${esc(b.numero)}<br>${dt(b.created_at)}</p><p>Vendeur : ${esc(b.vendeur)}${b.client?'<br>Client : '+esc(b.client):''}${ci(b).matricule_fiscal?'<br>MF : '+esc(ci(b).matricule_fiscal):''}${ci(b).adresse?'<br>Adresse : '+esc(ci(b).adresse):''}<br>Paiement : ${MT[b.mode_paiement]||''}</p><hr>`
+function tick(b,w){if(pmode()==='rawbt')return rawbt(escBL(b,pw()));if(!w&&!BT?.dev&&btSaved())return btRestore().then(()=>tick(b,1));if(BT?.dev)return btSend(escBL(b,pw())).catch(btErr);$('tk').innerHTML=`<h2>BON DE LIVRAISON</h2><p class="c">${esc(b.numero)}<br>${dt(b.created_at)}</p><p>Vendeur : ${esc(b.vendeur)}${b.client?'<br>Client : '+esc(b.client):''}${ci(b).matricule_fiscal?'<br>MF : '+esc(ci(b).matricule_fiscal):''}${ci(b).adresse?'<br>Adresse : '+esc(ci(b).adresse):''}<br>Paiement : ${MT[b.mode_paiement]||''}</p><hr>`
   +b.lignes.map(l=>`<div><b>${esc(l.designation)}</b><div class="r"><span>${l.qte} x ${r3(l.prix).toFixed(3)}</span><span>${r3(l.total).toFixed(3)}</span></div></div>`).join('')
   +`<hr><div class="r t"><span>TOTAL</span><span>${fmt(b.total)}</span></div>${b.notes?'<p>'+esc(b.notes)+'</p>':''}<hr><p class="c">Merci de votre confiance<br>${esc(FOOTER)}</p>`;pr()}
 
@@ -297,7 +299,7 @@ function jc(){if(!J)return toast("Ouvrez d'abord le journal",1);if(!J.bl.length)
   J.bl.forEach((b,i)=>{if(i)d.addPage();blPage(d,b)});
   const n=d.getNumberOfPages();for(let p=1;p<=n;p++){d.setPage(p);d.setFontSize(8);d.text(FOOTER+'  ·  Page '+p+'/'+n,105,290,{align:'center'})}
   d.save(`Copies_BL_${J.from}_${J.to}.pdf`)}
-function jtick(w){if(!w&&!BT?.dev&&btSaved())return btRestore().then(()=>jtick(1));if(BT?.dev&&J)return btSend(escJ(jstat(J.bl,J.rg),pw())).catch(btErr);if(!J)return toast("Ouvrez d'abord le journal",1);const o=jstat(J.bl,J.rg),L=(a,b)=>`<div class="r"><span>${a}</span><span>${b}</span></div>`;
+function jtick(w){if(pmode()==='rawbt'&&J)return rawbt(escJ(jstat(J.bl,J.rg),pw()));if(!w&&!BT?.dev&&btSaved())return btRestore().then(()=>jtick(1));if(BT?.dev&&J)return btSend(escJ(jstat(J.bl,J.rg),pw())).catch(btErr);if(!J)return toast("Ouvrez d'abord le journal",1);const o=jstat(J.bl,J.rg),L=(a,b)=>`<div class="r"><span>${a}</span><span>${b}</span></div>`;
   $('tk').innerHTML=`<h2>JOURNAL DES VENTES</h2><p class="c">Du ${fd(J.from)} au ${fd(J.to)}<br>Imprimé le ${dt(new Date())}</p><hr>`+L('Nombre de BL',o.nb)+L('Total ventes',fmt(o.total))+'<hr>'
   +L('Ventes espèces',fmt(o.especes))+L('Ventes chèque',fmt(o.cheque))+L('Ventes crédit',fmt(o.credit))+L('Règl. espèces',fmt(o.re))+L('Règl. chèque',fmt(o.rc))+'<hr>'
   +L('Espèces encaissé',fmt(o.ee))+L('Chèques encaissé',fmt(o.ec))+`<div class="r t"><span>ENCAISSÉ</span><span>${fmt(o.enc)}</span></div>`+(isAdmin()?'<hr>'+L('Marge',fmt(o.marge)):'');pr()}
@@ -437,10 +439,12 @@ document.addEventListener('change',async e=>{const t=e.target;
   if(t.id==='fi'&&t.files[0]){try{await importFile(t.dataset.t,t.files[0])}catch(x){toast('Import : '+x.message,1)}t.value=''}});
 $('mok').onclick=async()=>{$('mok').disabled=true;try{await okFn()}finally{$('mok').disabled=false}};
 $('ov').onclick=e=>{if(e.target===$('ov'))closeModal()};addEventListener('keydown',e=>{if(e.key==='Escape')closeModal()});
-$('tsz').value=tfs();$('pw').value=pw();$('pw').onchange=()=>{try{localStorage.pw=$('pw').value}catch{}};$('tsz').onchange=()=>{try{localStorage.tsz=$('tsz').value}catch{}};$('hs').oninput=renderHist;$('as').oninput=renderArt;$('cq').oninput=renderCli;$('cl').oninput=cinfo;$('sq').onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();if(stkAdd($('sq').value,true)){$('sq').value='';$('ddq').hidden=true}}};$('sq').oninput=()=>sdd();document.addEventListener('keydown',e=>{if(e.key==='Enter'&&e.target.dataset?.sq!==undefined){e.preventDefault();$('sq').focus()}});$('smode').onchange=stkRender;$('aq').onkeydown=e=>{if(e.key!=='Enter')return;const l=refFind($('aq').value);if(l.length===1){e.preventDefault();$('aq').value='';$('dda').hidden=true;pickA({id:l[0].id})}};$('aq').oninput=$('aq').onfocus=dd;
+$('tsz').value=tfs();$('pw').value=pw();$('pm').value=pmode();$('pm').onchange=()=>{try{localStorage.pm=$('pm').value}catch{}};$('pw').onchange=()=>{try{localStorage.pw=$('pw').value}catch{}};$('tsz').onchange=()=>{try{localStorage.tsz=$('tsz').value}catch{}};$('hs').oninput=renderHist;$('as').oninput=renderArt;$('cq').oninput=renderCli;$('cl').oninput=cinfo;$('sq').onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();if(stkAdd($('sq').value,true)){$('sq').value='';$('ddq').hidden=true}}};$('sq').oninput=()=>sdd();document.addEventListener('keydown',e=>{if(e.key==='Enter'&&e.target.dataset?.sq!==undefined){e.preventDefault();$('sq').focus()}});$('smode').onchange=stkRender;$('aq').onkeydown=e=>{if(e.key!=='Enter')return;const l=refFind($('aq').value);if(l.length===1){e.preventDefault();$('aq').value='';$('dda').hidden=true;pickA({id:l[0].id})}};$('aq').oninput=$('aq').onfocus=dd;
 addEventListener('online',async()=>{NET=true;netUI();const n=await syncQueue();if(n&&!QUEUE.length)loadAll()});
 addEventListener('offline',()=>{NET=false;netUI()});
 setInterval(async()=>{if(QUEUE.length&&navigator.onLine){const n=await syncQueue();if(n&&!QUEUE.length)loadAll()}},60000);
+// Garde la liaison Bluetooth active entre deux impressions (commande ESC @, sans effet visible)
+setInterval(()=>{if(btBusy||!BT?.ch||!BT.dev.gatt.connected)return;const c=BT.ch,b=Uint8Array.of(27,64);try{(c.properties.write?c.writeValue(b):c.writeValueWithoutResponse(b)).catch(()=>{})}catch{}},4000);
 let IP=null;addEventListener('beforeinstallprompt',e=>{e.preventDefault();IP=e;$('inst').hidden=false});addEventListener('appinstalled',()=>{IP=null;$('inst').hidden=true});
 if('serviceWorker' in navigator)addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));
 </script></body></html>
