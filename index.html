@@ -85,13 +85,15 @@ input,textarea,select{width:100%;padding:8px 10px;border:1.5px solid #e0e5ea;bor
 </div>
 
 <div id="ov" class="overlay" hidden><div class="modal"><h3 id="mt"></h3><div id="mb"></div><div class="mf"><button class="btn s" data-act="close">Annuler</button><button class="btn g" id="mok">Valider</button></div></div></div>
-<div id="sc" class="overlay" style="z-index:600" hidden><div class="modal"><h3>Scanner un code</h3><div id="qr" style="width:100%"></div><p class="mut">Placez le QR code ou le code-barres devant la caméra.</p><p class="mut" id="scn"></p><div class="mf"><button class="btn s" data-act="scanx">Fermer</button></div></div></div>
+<div id="sc" class="overlay" style="z-index:600" hidden><div class="modal"><h3>Scanner un code</h3><div id="qr" style="width:100%;position:relative;overflow:hidden;border-radius:10px;background:#000;min-height:120px"></div>
+<div class="bar" style="margin:8px 0 0"><button class="btn s" id="torch" data-act="torch" hidden>🔦 Flash</button><input type="range" id="zoom" hidden style="flex:1;min-width:120px" title="Zoom"></div>
+<p class="mut">Placez le code dans le cadre : la lecture est automatique.</p><p class="mut" id="scn"></p><div class="mf"><button class="btn s" data-act="scanx">Fermer</button></div></div></div>
 <div id="tk"></div>
 
 <script>
 // ⚠️ À remplacer par les valeurs de votre NOUVEAU projet Supabase
-const SUPABASE_URL='https://qdsxoufmftkqtpovvkjp.supabase.co', SUPABASE_KEY='sb_publishable_QzwPSlWNhj_YR2jupgTZXA_BXVKEBML';
-const FOOTER='© SABEUR — Tél : 55296392';
+const SUPABASE_URL='https://NOUVEAU-PROJET.supabase.co', SUPABASE_KEY='NOUVELLE_CLE_ANON_PUBLIQUE';
+const FOOTER='© Anas MGHIRBI — Tél : 98754193';
 const sb=supabase.createClient(SUPABASE_URL,SUPABASE_KEY,{global:{fetch:(u,o={})=>fetch(u,o.signal?o:{...o,signal:AbortSignal.timeout(15000)})}});
 const $=id=>document.getElementById(id);
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -177,7 +179,7 @@ function cart(){
   $('total').textContent=fmt(t);$('mg').textContent='Marge : '+fmt(m);$('vbtn').disabled=!panier.length;
   $('vbtn').textContent=editId?'💾 Enregistrer la modification':'✅ Valider et imprimer le ticket';
   $('eb').hidden=!editId;if(editId)$('et').textContent='✏️ Modification du '+bls.find(b=>b.id===editId)?.numero}
-function addLine(a){const p=panier.find(x=>x.id===a.id);if(p)p.qte++;else panier.unshift({id:a.id,reference:a.reference||'',designation:a.designation,prix:Number(a.prix_vente),pa:Number(a.prix_achat),qte:1});cart()}
+function addLine(a){const p=panier.find(x=>x.id===a.id);if(p)p.qte++;else panier.unshift({id:a.id,reference:a.reference||'',designation:a.designation,prix:Number(a.prix_vente),pa:Number(a.prix_achat),qte:1});cart();setTimeout(()=>{const el=document.querySelector('[data-q="'+panier.findIndex(x=>x.id===a.id)+'"]');if(el){el.focus();el.select()}},60)}
 function pickA(d){$('aq').value='';$('dda').hidden=true;addLine(articles.find(x=>x.id===d.id))}
 function reset(){panier=[];editId=null;old={};$('cl').value='';$('mp').value='especes';$('notes').value='';cinfo();cart()}
 async function valider(){
@@ -207,7 +209,7 @@ function escp(W,fn){const o=[27,64,27,116,0],H='-'.repeat(W),T=s=>o.push(...enc(
 const escBL=(b,W)=>escp(W,({T,C,H,L})=>{C([27,97,1,27,69,1,29,33,17]);T('BON DE LIVRAISON');C([29,33,0]);T(b.numero);C([27,69,0]);T(dt(b.created_at));C([27,97,0]);
   T('Vendeur : '+(b.vendeur||''));if(b.client)T('Client : '+b.client);if(ci(b).matricule_fiscal)T('MF : '+ci(b).matricule_fiscal);if(ci(b).adresse)wrap('Adresse : '+ci(b).adresse,W).forEach(x=>T(x));T('Paiement : '+(MT[b.mode_paiement]||''));T(H);
   b.lignes.forEach(l=>{wrap(l.designation,W).forEach(x=>T(x));L(l.qte+' x '+r3(l.prix).toFixed(3),r3(l.total).toFixed(3))});
-  T(H);C([27,69,1,29,33,1]);L('TOTAL',fmt(b.total));C([29,33,0,27,69,0]);if(b.notes)wrap(b.notes,W).forEach(x=>T(x));T(H);C([27,97,1]);T('Merci de votre confiance');T(FOOTER)});
+  T(H);C([27,69,1,29,33,1]);L('TOTAL',fmt(b.total));C([29,33,0,27,69,0]);if(b.notes)wrap(b.notes,W).forEach(x=>T(x));T(H);C([27,97,1]);T('Merci de votre visite');T(FOOTER)});
 const escJ=(o,W)=>escp(W,({T,C,H,L})=>{C([27,97,1,27,69,1]);T('JOURNAL DES VENTES');C([27,69,0]);T('Du '+fd(J.from)+' au '+fd(J.to));T('Imprimé le '+dt(new Date()));C([27,97,0]);T(H);
   L('Nombre de BL',o.nb);L('Total ventes',fmt(o.total));T(H);L('Ventes espèces',fmt(o.especes));L('Ventes chèque',fmt(o.cheque));L('Ventes crédit',fmt(o.credit));L('Règl. espèces',fmt(o.re));L('Règl. chèque',fmt(o.rc));T(H);
   L('Espèces encaissé',fmt(o.ee));L('Chèques encaissé',fmt(o.ec));C([27,69,1,29,33,1]);L('ENCAISSÉ',fmt(o.enc));C([29,33,0,27,69,0]);if(isAdmin()){T(H);L('Marge',fmt(o.marge))}});
@@ -229,7 +231,7 @@ async function btpair(){
 
 function tick(b,w){if(pmode()==='rawbt')return rawbt(escBL(b,pw()));if(!w&&!BT?.dev&&btSaved())return btRestore().then(()=>tick(b,1));if(BT?.dev)return btSend(escBL(b,pw())).catch(btErr);$('tk').innerHTML=`<h2>BON DE LIVRAISON</h2><p class="c">${esc(b.numero)}<br>${dt(b.created_at)}</p><p>Vendeur : ${esc(b.vendeur)}${b.client?'<br>Client : '+esc(b.client):''}${ci(b).matricule_fiscal?'<br>MF : '+esc(ci(b).matricule_fiscal):''}${ci(b).adresse?'<br>Adresse : '+esc(ci(b).adresse):''}<br>Paiement : ${MT[b.mode_paiement]||''}</p><hr>`
   +b.lignes.map(l=>`<div><b>${esc(l.designation)}</b><div class="r"><span>${l.qte} x ${r3(l.prix).toFixed(3)}</span><span>${r3(l.total).toFixed(3)}</span></div></div>`).join('')
-  +`<hr><div class="r t"><span>TOTAL</span><span>${fmt(b.total)}</span></div>${b.notes?'<p>'+esc(b.notes)+'</p>':''}<hr><p class="c">Merci de votre confiance<br>${esc(FOOTER)}</p>`;pr()}
+  +`<hr><div class="r t"><span>TOTAL</span><span>${fmt(b.total)}</span></div>${b.notes?'<p>'+esc(b.notes)+'</p>':''}<hr><p class="c">Merci de votre visite<br>${esc(FOOTER)}</p>`;pr()}
 
 // ── Journal de vente ──
 let J=null;
@@ -285,7 +287,7 @@ function blPage(d,b){const c=clients.find(x=>x.id===b.client_id);
 function blFoot(d){const n=d.getNumberOfPages();for(let p=1;p<=n;p++){d.setPage(p);d.setFontSize(8);d.text(FOOTER+'  ·  Page '+p+'/'+n,105,290,{align:'center'})}}
 const blText=(b,w)=>{const B=x=>w?'*'+x+'*':x,L=[B('BON DE LIVRAISON'),'N° '+b.numero,'Date : '+dt(b.created_at),'Client : '+(b.client||'Comptoir'),'Paiement : '+(MX[b.mode_paiement]||''),'------------------------------',
   ...b.lignes.map(l=>l.designation+'\n   '+r3(l.qte)+' x '+r3(l.prix).toFixed(3)+' = '+r3(l.total).toFixed(3)),'------------------------------',B('TOTAL : '+fmt(b.total))];
-  if(b.notes)L.push(b.notes);L.push('','Merci de votre confiance',FOOTER);return L.join('\n')};
+  if(b.notes)L.push(b.notes);L.push('','Merci de votre visite',FOOTER);return L.join('\n')};
 const waNum=t=>{let n=String(t||'').split(/[\/,;]/)[0].replace(/\D/g,'');if(n.startsWith('00'))n=n.slice(2);if(n.length===8)n='216'+n;return n};
 function sendBL(d){const b=bls.find(x=>x.id===d.id),c=ci(b);
   modal('Envoyer '+b.numero,`<p class="mut">${esc(b.client||'Comptoir')}${c.telephone?' · '+esc(c.telephone):''}${c.email?' · '+esc(c.email):''}</p><div style="display:grid;gap:8px"><button class="btn g" data-act="sw" data-id="${b.id}">💬 WhatsApp (message)</button><button class="btn s" data-act="sm" data-id="${b.id}">✉️ E-mail</button><button class="btn s" data-act="sp" data-id="${b.id}">📎 Partager le PDF (WhatsApp, e-mail…)</button></div>`,closeModal);$('mok').hidden=true}
@@ -305,12 +307,45 @@ function jtick(w){if(pmode()==='rawbt'&&J)return rawbt(escJ(jstat(J.bl,J.rg),pw(
   +L('Espèces encaissé',fmt(o.ee))+L('Chèques encaissé',fmt(o.ec))+`<div class="r t"><span>ENCAISSÉ</span><span>${fmt(o.enc)}</span></div>`+(isAdmin()?'<hr>'+L('Marge',fmt(o.marge)):'');pr()}
 
 // ── Scan QR code / code-barres ──
-let QR=null;
-function qrStop(){$('sc').hidden=true;if(QR){const q=QR;QR=null;q.stop().then(()=>q.clear()).catch(()=>{})}}
-function scan(d){if(!window.Html5Qrcode)return toast("Scanner indisponible : librairie non chargée",1);$('sc').hidden=false;$('scn').textContent='';
-  QR=new Html5Qrcode('qr',{verbose:false});
-  QR.start({facingMode:'environment'},{fps:10,qrbox:{width:250,height:170},experimentalFeatures:{useBarCodeDetectorIfSupported:true}},txt=>{if(!QR)return;qrStop();onScan(txt,d.t)},()=>{})
-    .catch(e=>{qrStop();toast('Caméra indisponible : '+(e.message||e)+' (HTTPS et autorisation caméra requis)',1)})}
+let QR=null,NS=null,lastRead={c:'',n:0};
+const SCAN_FMT=['ean_13','ean_8','upc_a','upc_e','code_128','code_39','code_93','itf','codabar','qr_code','data_matrix'];
+function eanOk(c){if(!/^(\d{8}|\d{12,13})$/.test(c))return false;const t=[...c.slice(0,-1)].reverse().reduce((a,x,i)=>a+x*(i%2?1:3),0);return (10-t%10)%10===+c.slice(-1)}
+function accept(c,f){f=String(f||'').toLowerCase();c=String(c||'').trim();if(!c)return false;
+  if(/^(ean_13|ean_8|upc_a)$/.test(f)&&!eanOk(c))return false;
+  if(f==='qr_code'||/^(ean_13|ean_8|upc_a|upc_e)$/.test(f))return true;
+  if(c===lastRead.c)lastRead.n++;else lastRead={c,n:1};return lastRead.n>=2}
+const camTrack=()=>{const s=NS?.stream||document.querySelector('#qr video')?.srcObject;return s?.getVideoTracks?.()[0]};
+function camTools(){const t=camTrack(),c=t?.getCapabilities?.()||{},T=$('torch'),Z=$('zoom');
+  T.hidden=!c.torch;T.dataset.on='';T.textContent='🔦 Flash';T.classList.remove('g');
+  Z.hidden=!c.zoom;if(c.zoom){Z.min=c.zoom.min;Z.max=c.zoom.max;Z.step=c.zoom.step||0.1;Z.value=c.zoom.min}
+  try{if(c.focusMode?.includes?.('continuous'))t.applyConstraints({advanced:[{focusMode:'continuous'}]}).catch(()=>{})}catch{}}
+async function torch(){const t=camTrack();if(!t)return;const on=$('torch').dataset.on!=='1';
+  try{await t.applyConstraints({advanced:[{torch:on}]});$('torch').dataset.on=on?'1':'';$('torch').textContent=on?'🔦 Flash : activé':'🔦 Flash';$('torch').classList.toggle('g',on)}catch{toast('Flash indisponible sur cet appareil',1)}}
+function qrStop(){$('sc').hidden=true;if(NS){NS.stream.getTracks().forEach(t=>t.stop());NS=null;$('qr').innerHTML=''}
+  if(QR){const q=QR;QR=null;q.stop().then(()=>q.clear()).catch(()=>{})}$('torch').hidden=true;$('zoom').hidden=true}
+async function scanNative(d,fmts){const det=new BarcodeDetector({formats:fmts});
+  const stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:'environment'},width:{ideal:1920},height:{ideal:1080}},audio:false});
+  if($('sc').hidden){stream.getTracks().forEach(t=>t.stop());return}
+  const v=document.createElement('video');v.setAttribute('playsinline','');v.muted=true;v.srcObject=stream;v.style.cssText='width:100%;display:block';
+  const g=document.createElement('div');g.style.cssText='position:absolute;inset:22% 7%;border:2px solid #2ecc71;border-radius:8px;pointer-events:none;box-shadow:0 0 0 999px #0005';
+  $('qr').append(v,g);await v.play();NS={stream,v};camTools();lastRead={c:'',n:0};
+  const tick=async()=>{if(!NS||NS.v!==v)return;
+    try{if(v.readyState>=2)for(const x of await det.detect(v))if(accept(x.rawValue,x.format)){const c=x.rawValue;qrStop();beep();navigator.vibrate?.(60);return onScan(c,d.t)}}catch{}
+    if(NS&&NS.v===v)setTimeout(tick,30)};tick()}
+function scanLib(d){if(!window.Html5Qrcode){qrStop();return toast("Scanner indisponible : librairie non chargée",1)}
+  const F=window.Html5QrcodeSupportedFormats,fm=F?[F.QR_CODE,F.EAN_13,F.EAN_8,F.UPC_A,F.UPC_E,F.CODE_128,F.CODE_39,F.CODE_93,F.ITF,F.CODABAR,F.DATA_MATRIX].filter(x=>x!==undefined):undefined;
+  QR=new Html5Qrcode('qr',{verbose:false,formatsToSupport:fm,useBarCodeDetectorIfSupported:true,experimentalFeatures:{useBarCodeDetectorIfSupported:true}});
+  const cb=(txt,res)=>{if(!QR)return;if(accept(txt,res?.result?.format?.formatName)){qrStop();beep();navigator.vibrate?.(60);onScan(txt,d.t)}},
+    go=c=>QR.start({facingMode:'environment'},c,cb,()=>{});
+  go({fps:15,disableFlip:true,qrbox:(w,h)=>({width:Math.floor(w*0.88),height:Math.floor(Math.min(h,w)*0.55)}),experimentalFeatures:{useBarCodeDetectorIfSupported:true},videoConstraints:{facingMode:'environment',width:{ideal:1920},height:{ideal:1080}}})
+    .catch(()=>QR?go({fps:10,qrbox:{width:250,height:170}}):null).then(()=>setTimeout(camTools,500))
+    .catch(e=>{qrStop();toast('Caméra indisponible : '+(e?.message||e)+' (HTTPS et autorisation caméra requis)',1)})}
+async function scan(d){$('sc').hidden=false;$('scn').textContent='';$('qr').innerHTML='';lastRead={c:'',n:0};
+  if('BarcodeDetector' in window){try{const sup=await BarcodeDetector.getSupportedFormats(),f=SCAN_FMT.filter(x=>sup.includes(x));if(f.length)return await scanNative(d,f)}
+    catch(e){if(/NotAllowed|Permission|NotFound|NotReadable/i.test((e?.name||'')+(e?.message||''))){qrStop();return toast('Caméra indisponible : '+(e.message||e.name)+' (autorisation caméra et HTTPS requis)',1)}
+      if(NS){NS.stream.getTracks().forEach(t=>t.stop());NS=null}$('qr').innerHTML=''}}
+  scanLib(d)}
+
 function onScan(code,t){code=String(code).trim();if(t==='stk')return stkAdd(code);navigator.vibrate?.(60);const i=$(t);i.value=code;
   if(t==='cl'){const n=norm(code),c=clients.find(x=>[x.code,x.telephone,x.matricule_fiscal,x.nom].some(v=>v&&norm(v)===n));i.value=c?c.nom:'';cinfo();return toast(c?'Client : '+c.nom:'Aucun client trouvé pour le code '+code,!c)}
   if(t==='aq'){const l=refFind(code);if(l.length===1){i.value='';pickA({id:l[0].id});return toast('Ajouté : '+l[0].designation)}dd();return toast(l.length?l.length+' articles correspondent : choisissez dans la liste':'Code non trouvé : '+code,!l.length)}
@@ -424,7 +459,7 @@ const A={logout:async()=>{if(QUEUE.length&&!confirm(QUEUE.length+' opération(s)
   sync:async()=>{if(QUEUE.length){const n=await syncQueue();if(n&&!QUEUE.length)loadAll()}else loadAll()},refresh:async()=>{await loadAll();toast('Actualisé')},close:closeModal,
   pickA,inc:d=>{panier[d.i].qte++;cart()},dec:d=>{if(--panier[d.i].qte<=0)panier.splice(d.i,1);cart()},rm:d=>{panier.splice(d.i,1);cart()},valider,cancel:reset,
   edit:d=>formModal(articles.find(x=>x.id===d.id)),add:()=>formModal(),del:d=>del(d.id),
-  addC:()=>cliModal(),jp,jx,jf,jt:()=>jtick(),jc,btpair,scan,scanx:()=>qrStop(),spick:d=>{stkPick(articles.find(x=>x.id===d.id));$('sq').value='';$('ddq').hidden=true;$('sq').focus()},gostk:()=>go('stk'),send:sendBL,sw:sendWA,sm:sendMail,sp:sendPdf,svalid:stkValid,sinc:d=>{SL[d.i].qte++;stkRender()},sdec:d=>{SL[d.i].qte=Math.max(0,SL[d.i].qte-1);stkRender()},srm:d=>{SL.splice(d.i,1);stkRender()},cdebt:()=>{debtOnly=!debtOnly;renderCli()},xl:d=>exportXlsx(d.t),bak:backup,rest:()=>$('fr').click(),imp:d=>{$('fi').dataset.t=d.t;$('fi').click()},
+  addC:()=>cliModal(),jp,jx,jf,jt:()=>jtick(),jc,btpair,scan,scanx:()=>qrStop(),torch,spick:d=>{stkPick(articles.find(x=>x.id===d.id));$('sq').value='';$('ddq').hidden=true;$('sq').focus()},gostk:()=>go('stk'),send:sendBL,sw:sendWA,sm:sendMail,sp:sendPdf,svalid:stkValid,sinc:d=>{SL[d.i].qte++;stkRender()},sdec:d=>{SL[d.i].qte=Math.max(0,SL[d.i].qte-1);stkRender()},srm:d=>{SL.splice(d.i,1);stkRender()},cdebt:()=>{debtOnly=!debtOnly;renderCli()},xl:d=>exportXlsx(d.t),bak:backup,rest:()=>$('fr').click(),imp:d=>{$('fi').dataset.t=d.t;$('fi').click()},
   delAll:async d=>{if(!confirm('Supprimer TOUS les '+d.t+' ? Cette action est définitive.'))return;const {error}=await sb.from(d.t).delete().not('id','is',null);if(error)return toast(error.message,1);toast('Supprimé');loadAll()},editC:d=>cliModal(clients.find(x=>x.id===d.id)),reg:d=>regModal(clients.find(x=>x.id===d.id)),delC:d=>delC(d.id),
   tick:d=>tick(bls.find(c=>c.id===d.id)),editBL,delBL};
 document.addEventListener('click',e=>{if(!e.target.closest('.dd-wrap')){$('dda').hidden=true;$('ddq').hidden=true}
@@ -439,7 +474,7 @@ document.addEventListener('change',async e=>{const t=e.target;
   if(t.id==='fi'&&t.files[0]){try{await importFile(t.dataset.t,t.files[0])}catch(x){toast('Import : '+x.message,1)}t.value=''}});
 $('mok').onclick=async()=>{$('mok').disabled=true;try{await okFn()}finally{$('mok').disabled=false}};
 $('ov').onclick=e=>{if(e.target===$('ov'))closeModal()};addEventListener('keydown',e=>{if(e.key==='Escape')closeModal()});
-$('tsz').value=tfs();$('pw').value=pw();$('pm').value=pmode();$('pm').onchange=()=>{try{localStorage.pm=$('pm').value}catch{}};$('pw').onchange=()=>{try{localStorage.pw=$('pw').value}catch{}};$('tsz').onchange=()=>{try{localStorage.tsz=$('tsz').value}catch{}};$('hs').oninput=renderHist;$('as').oninput=renderArt;$('cq').oninput=renderCli;$('cl').oninput=cinfo;$('sq').onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();if(stkAdd($('sq').value,true)){$('sq').value='';$('ddq').hidden=true}}};$('sq').oninput=()=>sdd();document.addEventListener('keydown',e=>{if(e.key==='Enter'&&e.target.dataset?.sq!==undefined){e.preventDefault();$('sq').focus()}});$('smode').onchange=stkRender;$('aq').onkeydown=e=>{if(e.key!=='Enter')return;const l=refFind($('aq').value);if(l.length===1){e.preventDefault();$('aq').value='';$('dda').hidden=true;pickA({id:l[0].id})}};$('aq').oninput=$('aq').onfocus=dd;
+$('tsz').value=tfs();$('pw').value=pw();$('pm').value=pmode();$('pm').onchange=()=>{try{localStorage.pm=$('pm').value}catch{}};$('pw').onchange=()=>{try{localStorage.pw=$('pw').value}catch{}};$('tsz').onchange=()=>{try{localStorage.tsz=$('tsz').value}catch{}};$('hs').oninput=renderHist;$('as').oninput=renderArt;$('cq').oninput=renderCli;$('cl').oninput=cinfo;$('sq').onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();if(stkAdd($('sq').value,true)){$('sq').value='';$('ddq').hidden=true}}};$('sq').oninput=()=>sdd();document.addEventListener('keydown',e=>{const t=e.target;if(e.key==='Enter'&&(t.dataset?.sq!==undefined||t.dataset?.q!==undefined)){e.preventDefault();(t.dataset.q!==undefined?$('aq'):$('sq')).focus()}});$('zoom').oninput=()=>camTrack()?.applyConstraints({advanced:[{zoom:+$('zoom').value}]})?.catch(()=>{});$('smode').onchange=stkRender;$('aq').onkeydown=e=>{if(e.key!=='Enter')return;const l=refFind($('aq').value);if(l.length===1){e.preventDefault();$('aq').value='';$('dda').hidden=true;pickA({id:l[0].id})}};$('aq').oninput=$('aq').onfocus=dd;
 addEventListener('online',async()=>{NET=true;netUI();const n=await syncQueue();if(n&&!QUEUE.length)loadAll()});
 addEventListener('offline',()=>{NET=false;netUI()});
 setInterval(async()=>{if(QUEUE.length&&navigator.onLine){const n=await syncQueue();if(n&&!QUEUE.length)loadAll()}},60000);
