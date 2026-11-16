@@ -79,21 +79,21 @@ input,textarea,select{width:100%;padding:8px 10px;border:1.5px solid #e0e5ea;bor
 <div class="bar"><label>Du <input type="date" id="jd1" style="width:150px"></label><label>Au <input type="date" id="jd2" style="width:150px"></label>
 <button class="btn s sm" data-act="jp" data-d="0">Aujourd'hui</button><button class="btn s sm" data-act="jp" data-d="1">Hier</button><button class="btn s sm" data-act="jp" data-d="7">7 jours</button><button class="btn s sm" data-act="jp" data-d="m">Ce mois</button></div>
 <div class="bar"><button class="btn g sm" data-act="jx">📊 Excel</button><button class="btn g sm" data-act="jf">📄 PDF</button><button class="btn g sm" data-act="jc">🗂️ Copies des BL (PDF)</button><button class="btn s sm" data-act="jt">🖨️ Ticket</button></div><div id="jr"></div></div></div>
-<div id="p_usr" class="page"><div class="card"><h3>💾 Sauvegarde et restauration</h3><p class="mut">La sauvegarde contient les articles (avec stock), les clients, tous les BL et les règlements. Le fichier est enregistré dans le dossier Téléchargements de votre téléphone ou PC.</p><div class="bar"><button class="btn g" data-act="bak">💾 Sauvegarder toutes les données</button><button class="btn s" data-act="rest">📂 Restaurer une sauvegarde</button></div></div><div class="card"><h3>🔑 Utilisateurs et rôles</h3><p class="mut">Créez les comptes dans Supabase (Authentication > Users) : ils apparaissent ici avec le rôle « Utilisateur ».</p><div id="usr"></div></div></div>
+<div id="p_usr" class="page"><div class="card"><h3>💾 Sauvegarde et restauration</h3><p class="mut">La sauvegarde contient les articles (avec stock), les clients, tous les BL et les règlements. Le fichier est enregistré dans le dossier Téléchargements de votre téléphone ou PC.</p><div class="bar"><button class="btn g" data-act="bak">💾 Sauvegarder toutes les données</button><button class="btn s" data-act="rest">📂 Restaurer une sauvegarde</button></div></div><div class="card"><h3>🧹 Remise à zéro des stocks</h3><p class="mut">Remet le stock de tous les articles à 0. Votre mot de passe de connexion est demandé, et une sauvegarde est téléchargée automatiquement avant.</p><button class="btn r" data-act="raz">🧹 Remettre tous les stocks à zéro</button></div><div class="card"><h3>🔑 Utilisateurs et rôles</h3><p class="mut">Créez les comptes dans Supabase (Authentication > Users) : ils apparaissent ici avec le rôle « Utilisateur ».</p><div id="usr"></div></div></div>
 <div id="p_cli" class="page"><div class="card"><div class="bar"><h3>👥 Clients <small id="cc"></small></h3><input id="cq" placeholder="🔍 Nom, code, tél., matricule…" style="width:200px"><button class="btn s sm" data-act="scan" data-t="cq" title="Scanner un code">📷</button><button class="btn s sm" id="cdb" data-act="cdebt">💳 Clients avec solde</button><button class="btn s sm" data-act="xl" data-t="clients">📤 Excel</button><button class="btn s sm" data-act="imp" data-t="clients">📥 Importer</button><button class="btn g sm" data-act="addC">➕ Nouveau</button></div><div id="cli"></div><div class="adm" style="margin-top:12px"><button class="btn r sm" data-act="delAll" data-t="clients">🗑️ Supprimer tous les clients</button></div></div></div>
 <input type="file" id="fi" accept=".xlsx,.xls,.csv" hidden><input type="file" id="fr" accept=".json,application/json" hidden>
 </div>
 
 <div id="ov" class="overlay" hidden><div class="modal"><h3 id="mt"></h3><div id="mb"></div><div class="mf"><button class="btn s" data-act="close">Annuler</button><button class="btn g" id="mok">Valider</button></div></div></div>
 <div id="sc" class="overlay" style="z-index:600" hidden><div class="modal"><h3>Scanner un code</h3><div id="qr" style="width:100%;position:relative;overflow:hidden;border-radius:10px;background:#000;min-height:120px"></div>
-<div class="bar" style="margin:8px 0 0"><button class="btn s" id="torch" data-act="torch" hidden>🔦 Flash</button><input type="range" id="zoom" hidden style="flex:1;min-width:120px" title="Zoom"></div>
+<div class="bar" style="margin:8px 0 0"><button class="btn s" id="torch" data-act="torch" hidden>🔦 Flash</button><button class="btn s" id="camsw" data-act="camsw" hidden>🔄 Caméra</button><input type="range" id="zoom" hidden style="flex:1;min-width:120px" title="Zoom"></div>
 <p class="mut">Placez le code dans le cadre : la lecture est automatique.</p><p class="mut" id="scn"></p><div class="mf"><button class="btn s" data-act="scanx">Fermer</button></div></div></div>
 <div id="tk"></div>
 
 <script>
 // ⚠️ À remplacer par les valeurs de votre NOUVEAU projet Supabase
-const SUPABASE_URL='https://qdsxoufmftkqtpovvkjp.supabase.co', SUPABASE_KEY='sb_publishable_QzwPSlWNhj_YR2jupgTZXA_BXVKEBML';
-const FOOTER='© Anas MGHIRBI — Tél : 98754193';
+const SUPABASE_URL='https://qdsxoufmftkqtpovvkjp.supabase.co', SUPABASE_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFkc3hvdWZtZnRrcXRwb3Z2a2pwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTQzMTI5NTAsImV4cCI6MjEwOTg4ODk1MH0.FwA7oMovnx_Q6fyH9QQwn-ArHEhF_JnY-iqiVzH61Bc';
+const FOOTER='© Anas SABEUR — Tél : 52296392';
 const sb=supabase.createClient(SUPABASE_URL,SUPABASE_KEY,{global:{fetch:(u,o={})=>fetch(u,o.signal?o:{...o,signal:AbortSignal.timeout(15000)})}});
 const $=id=>document.getElementById(id);
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -143,7 +143,7 @@ async function start(u){
   me=data||await IDB.get('me').catch(()=>null)||{id:u.id,nom:u.email,role:'user'};if(data){IDB.set('me',me).catch(()=>{});IDB.set('user',{id:u.id,email:u.email}).catch(()=>{})}
   QUEUE=(await IDB.get('queue').catch(()=>null))||[];
   $('login').hidden=true;$('app').hidden=false;document.body.classList.toggle('admin',isAdmin());
-  $('who').textContent=me.nom+(isAdmin()?' · admin':' · utilisateur')+' · v7';btRestore();go('cmd');cart();await loadAll()}
+  $('who').textContent=me.nom+(isAdmin()?' · admin':' · utilisateur')+' · v8';btRestore();go('cmd');cart();await loadAll()}
 (async()=>{let r={};try{r=await sb.auth.getSession()}catch(e){r={error:e}}
   if(r.data?.session)return start(r.data.session.user);
   const u=await IDB.get('user').catch(()=>null);if(u&&(!navigator.onLine||isNet(r.error)))start(u)})();
@@ -209,7 +209,7 @@ function escp(W,fn){const o=[27,64,27,116,0],H='-'.repeat(W),T=s=>o.push(...enc(
 const escBL=(b,W)=>escp(W,({T,C,H,L})=>{C([27,97,1,27,69,1,29,33,17]);T('BON DE LIVRAISON');C([29,33,0]);T(b.numero);C([27,69,0]);T(dt(b.created_at));C([27,97,0]);
   T('Vendeur : '+(b.vendeur||''));if(b.client)T('Client : '+b.client);if(ci(b).matricule_fiscal)T('MF : '+ci(b).matricule_fiscal);if(ci(b).adresse)wrap('Adresse : '+ci(b).adresse,W).forEach(x=>T(x));T('Paiement : '+(MT[b.mode_paiement]||''));T(H);
   b.lignes.forEach(l=>{wrap(l.designation,W).forEach(x=>T(x));L(l.qte+' x '+r3(l.prix).toFixed(3),r3(l.total).toFixed(3))});
-  T(H);C([27,69,1,29,33,1]);L('TOTAL',fmt(b.total));C([29,33,0,27,69,0]);if(b.notes)wrap(b.notes,W).forEach(x=>T(x));T(H);C([27,97,1]);T('Merci de votre visite');T(FOOTER)});
+  T(H);C([27,69,1,29,33,1]);L('TOTAL',fmt(b.total));C([29,33,0,27,69,0]);if(b.notes)wrap(b.notes,W).forEach(x=>T(x));T(H);C([27,97,1]);T('Merci de votre confiance');T(FOOTER)});
 const escJ=(o,W)=>escp(W,({T,C,H,L})=>{C([27,97,1,27,69,1]);T('JOURNAL DES VENTES');C([27,69,0]);T('Du '+fd(J.from)+' au '+fd(J.to));T('Imprimé le '+dt(new Date()));C([27,97,0]);T(H);
   L('Nombre de BL',o.nb);L('Total ventes',fmt(o.total));T(H);L('Ventes espèces',fmt(o.especes));L('Ventes chèque',fmt(o.cheque));L('Ventes crédit',fmt(o.credit));L('Règl. espèces',fmt(o.re));L('Règl. chèque',fmt(o.rc));T(H);
   L('Espèces encaissé',fmt(o.ee));L('Chèques encaissé',fmt(o.ec));C([27,69,1,29,33,1]);L('ENCAISSÉ',fmt(o.enc));C([29,33,0,27,69,0]);if(isAdmin()){T(H);L('Marge',fmt(o.marge))}});
@@ -231,7 +231,7 @@ async function btpair(){
 
 function tick(b,w){if(pmode()==='rawbt')return rawbt(escBL(b,pw()));if(!w&&!BT?.dev&&btSaved())return btRestore().then(()=>tick(b,1));if(BT?.dev)return btSend(escBL(b,pw())).catch(btErr);$('tk').innerHTML=`<h2>BON DE LIVRAISON</h2><p class="c">${esc(b.numero)}<br>${dt(b.created_at)}</p><p>Vendeur : ${esc(b.vendeur)}${b.client?'<br>Client : '+esc(b.client):''}${ci(b).matricule_fiscal?'<br>MF : '+esc(ci(b).matricule_fiscal):''}${ci(b).adresse?'<br>Adresse : '+esc(ci(b).adresse):''}<br>Paiement : ${MT[b.mode_paiement]||''}</p><hr>`
   +b.lignes.map(l=>`<div><b>${esc(l.designation)}</b><div class="r"><span>${l.qte} x ${r3(l.prix).toFixed(3)}</span><span>${r3(l.total).toFixed(3)}</span></div></div>`).join('')
-  +`<hr><div class="r t"><span>TOTAL</span><span>${fmt(b.total)}</span></div>${b.notes?'<p>'+esc(b.notes)+'</p>':''}<hr><p class="c">Merci de votre visite<br>${esc(FOOTER)}</p>`;pr()}
+  +`<hr><div class="r t"><span>TOTAL</span><span>${fmt(b.total)}</span></div>${b.notes?'<p>'+esc(b.notes)+'</p>':''}<hr><p class="c">Merci de votre confiance<br>${esc(FOOTER)}</p>`;pr()}
 
 // ── Journal de vente ──
 let J=null;
@@ -287,7 +287,7 @@ function blPage(d,b){const c=clients.find(x=>x.id===b.client_id);
 function blFoot(d){const n=d.getNumberOfPages();for(let p=1;p<=n;p++){d.setPage(p);d.setFontSize(8);d.text(FOOTER+'  ·  Page '+p+'/'+n,105,290,{align:'center'})}}
 const blText=(b,w)=>{const B=x=>w?'*'+x+'*':x,L=[B('BON DE LIVRAISON'),'N° '+b.numero,'Date : '+dt(b.created_at),'Client : '+(b.client||'Comptoir'),'Paiement : '+(MX[b.mode_paiement]||''),'------------------------------',
   ...b.lignes.map(l=>l.designation+'\n   '+r3(l.qte)+' x '+r3(l.prix).toFixed(3)+' = '+r3(l.total).toFixed(3)),'------------------------------',B('TOTAL : '+fmt(b.total))];
-  if(b.notes)L.push(b.notes);L.push('','Merci de votre visite',FOOTER);return L.join('\n')};
+  if(b.notes)L.push(b.notes);L.push('','Merci de votre confiance',FOOTER);return L.join('\n')};
 const waNum=t=>{let n=String(t||'').split(/[\/,;]/)[0].replace(/\D/g,'');if(n.startsWith('00'))n=n.slice(2);if(n.length===8)n='216'+n;return n};
 function sendBL(d){const b=bls.find(x=>x.id===d.id),c=ci(b);
   modal('Envoyer '+b.numero,`<p class="mut">${esc(b.client||'Comptoir')}${c.telephone?' · '+esc(c.telephone):''}${c.email?' · '+esc(c.email):''}</p><div style="display:grid;gap:8px"><button class="btn g" data-act="sw" data-id="${b.id}">💬 WhatsApp (message)</button><button class="btn s" data-act="sm" data-id="${b.id}">✉️ E-mail</button><button class="btn s" data-act="sp" data-id="${b.id}">📎 Partager le PDF (WhatsApp, e-mail…)</button></div>`,closeModal);$('mok').hidden=true}
@@ -307,7 +307,21 @@ function jtick(w){if(pmode()==='rawbt'&&J)return rawbt(escJ(jstat(J.bl,J.rg),pw(
   +L('Espèces encaissé',fmt(o.ee))+L('Chèques encaissé',fmt(o.ec))+`<div class="r t"><span>ENCAISSÉ</span><span>${fmt(o.enc)}</span></div>`+(isAdmin()?'<hr>'+L('Marge',fmt(o.marge)):'');pr()}
 
 // ── Scan QR code / code-barres ──
-let QR=null,NS=null,lastRead={c:'',n:0};
+let QR=null,NS=null,lastRead={c:'',n:0},CAMS=[],SCAN_D=null;
+// Choix de la caméra arrière PRINCIPALE (et non l'ultra grand-angle, le macro ou le téléobjectif)
+const camBad=/ultra|wide|large|macro|depth|tele|zoom|infra/i,camFront=/front|avant|user|selfie/i;
+const rearCams=l=>{const r=l.filter(x=>!camFront.test(x.label||''));return (r.length?r:l).slice().sort((a,b)=>String(a.label).localeCompare(String(b.label)))};
+function pickCam(l){const r=rearCams(l);let saved=null;try{saved=localStorage.cam}catch{}const s=r.find(x=>x.id===saved);if(s)return s;
+  const g=r.filter(x=>!camBad.test(x.label||''));return g.find(x=>/camera2? ?0\b|back|rear|arri|princip|main/i.test(x.label||''))||g[0]||r[0]}
+async function openCam(){const gum=v=>navigator.mediaDevices.getUserMedia({video:{...v,width:{ideal:1920},height:{ideal:1080}},audio:false});
+  let saved=null;try{saved=localStorage.cam}catch{}
+  let st=await gum(saved?{deviceId:{ideal:saved}}:{facingMode:{ideal:'environment'}}).catch(()=>gum({facingMode:{ideal:'environment'}}));
+  CAMS=(await navigator.mediaDevices.enumerateDevices()).filter(x=>x.kind==='videoinput').map(x=>({id:x.deviceId,label:x.label||''}));
+  const best=pickCam(CAMS),cur=st.getVideoTracks()[0]?.getSettings?.().deviceId;
+  if(best?.id&&best.id!==cur){st.getTracks().forEach(t=>t.stop());try{st=await gum({deviceId:{exact:best.id}})}catch{st=await gum({facingMode:{ideal:'environment'}})}}
+  return st}
+function camsw(){const l=rearCams(CAMS);if(l.length<2)return;const cur=camTrack()?.getSettings?.().deviceId,n=l[(l.findIndex(x=>x.id===cur)+1)%l.length],d=SCAN_D;
+  try{localStorage.cam=n.id}catch{}qrStop();toast('Caméra : '+(n.label||'suivante'));scan(d)}
 const SCAN_FMT=['ean_13','ean_8','upc_a','upc_e','code_128','code_39','code_93','itf','codabar','qr_code','data_matrix'];
 function eanOk(c){if(!/^(\d{8}|\d{12,13})$/.test(c))return false;const t=[...c.slice(0,-1)].reverse().reduce((a,x,i)=>a+x*(i%2?1:3),0);return (10-t%10)%10===+c.slice(-1)}
 function accept(c,f){f=String(f||'').toLowerCase();c=String(c||'').trim();if(!c)return false;
@@ -315,16 +329,16 @@ function accept(c,f){f=String(f||'').toLowerCase();c=String(c||'').trim();if(!c)
   if(f==='qr_code'||/^(ean_13|ean_8|upc_a|upc_e)$/.test(f))return true;
   if(c===lastRead.c)lastRead.n++;else lastRead={c,n:1};return lastRead.n>=2}
 const camTrack=()=>{const s=NS?.stream||document.querySelector('#qr video')?.srcObject;return s?.getVideoTracks?.()[0]};
-function camTools(){const t=camTrack(),c=t?.getCapabilities?.()||{},T=$('torch'),Z=$('zoom');
+function camTools(){const t=camTrack(),c=t?.getCapabilities?.()||{},T=$('torch'),Z=$('zoom');$('camsw').hidden=rearCams(CAMS).length<2;
   T.hidden=!c.torch;T.dataset.on='';T.textContent='🔦 Flash';T.classList.remove('g');
   Z.hidden=!c.zoom;if(c.zoom){Z.min=c.zoom.min;Z.max=c.zoom.max;Z.step=c.zoom.step||0.1;Z.value=c.zoom.min}
   try{if(c.focusMode?.includes?.('continuous'))t.applyConstraints({advanced:[{focusMode:'continuous'}]}).catch(()=>{})}catch{}}
 async function torch(){const t=camTrack();if(!t)return;const on=$('torch').dataset.on!=='1';
   try{await t.applyConstraints({advanced:[{torch:on}]});$('torch').dataset.on=on?'1':'';$('torch').textContent=on?'🔦 Flash : activé':'🔦 Flash';$('torch').classList.toggle('g',on)}catch{toast('Flash indisponible sur cet appareil',1)}}
 function qrStop(){$('sc').hidden=true;if(NS){NS.stream.getTracks().forEach(t=>t.stop());NS=null;$('qr').innerHTML=''}
-  if(QR){const q=QR;QR=null;q.stop().then(()=>q.clear()).catch(()=>{})}$('torch').hidden=true;$('zoom').hidden=true}
+  if(QR){const q=QR;QR=null;q.stop().then(()=>q.clear()).catch(()=>{})}$('torch').hidden=true;$('zoom').hidden=true;$('camsw').hidden=true}
 async function scanNative(d,fmts){const det=new BarcodeDetector({formats:fmts});
-  const stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:'environment'},width:{ideal:1920},height:{ideal:1080}},audio:false});
+  const stream=await openCam();
   if($('sc').hidden){stream.getTracks().forEach(t=>t.stop());return}
   const v=document.createElement('video');v.setAttribute('playsinline','');v.muted=true;v.srcObject=stream;v.style.cssText='width:100%;display:block';
   const g=document.createElement('div');g.style.cssText='position:absolute;inset:22% 7%;border:2px solid #2ecc71;border-radius:8px;pointer-events:none;box-shadow:0 0 0 999px #0005';
@@ -332,15 +346,16 @@ async function scanNative(d,fmts){const det=new BarcodeDetector({formats:fmts});
   const tick=async()=>{if(!NS||NS.v!==v)return;
     try{if(v.readyState>=2)for(const x of await det.detect(v))if(accept(x.rawValue,x.format)){const c=x.rawValue;qrStop();beep();navigator.vibrate?.(60);return onScan(c,d.t)}}catch{}
     if(NS&&NS.v===v)setTimeout(tick,30)};tick()}
-function scanLib(d){if(!window.Html5Qrcode){qrStop();return toast("Scanner indisponible : librairie non chargée",1)}
+async function scanLib(d){if(!window.Html5Qrcode){qrStop();return toast("Scanner indisponible : librairie non chargée",1)}
+  let cam={facingMode:'environment'};try{CAMS=(await Html5Qrcode.getCameras()).map(x=>({id:x.id,label:x.label||''}));const b=pickCam(CAMS);if(b?.id)cam=b.id}catch{}
   const F=window.Html5QrcodeSupportedFormats,fm=F?[F.QR_CODE,F.EAN_13,F.EAN_8,F.UPC_A,F.UPC_E,F.CODE_128,F.CODE_39,F.CODE_93,F.ITF,F.CODABAR,F.DATA_MATRIX].filter(x=>x!==undefined):undefined;
   QR=new Html5Qrcode('qr',{verbose:false,formatsToSupport:fm,useBarCodeDetectorIfSupported:true,experimentalFeatures:{useBarCodeDetectorIfSupported:true}});
   const cb=(txt,res)=>{if(!QR)return;if(accept(txt,res?.result?.format?.formatName)){qrStop();beep();navigator.vibrate?.(60);onScan(txt,d.t)}},
-    go=c=>QR.start({facingMode:'environment'},c,cb,()=>{});
+    go=c=>QR.start(cam,c,cb,()=>{});
   go({fps:15,disableFlip:true,qrbox:(w,h)=>({width:Math.floor(w*0.88),height:Math.floor(Math.min(h,w)*0.55)}),experimentalFeatures:{useBarCodeDetectorIfSupported:true},videoConstraints:{facingMode:'environment',width:{ideal:1920},height:{ideal:1080}}})
     .catch(()=>QR?go({fps:10,qrbox:{width:250,height:170}}):null).then(()=>setTimeout(camTools,500))
     .catch(e=>{qrStop();toast('Caméra indisponible : '+(e?.message||e)+' (HTTPS et autorisation caméra requis)',1)})}
-async function scan(d){$('sc').hidden=false;$('scn').textContent='';$('qr').innerHTML='';lastRead={c:'',n:0};
+async function scan(d){SCAN_D=d;$('sc').hidden=false;$('scn').textContent='';$('qr').innerHTML='';lastRead={c:'',n:0};
   if('BarcodeDetector' in window){try{const sup=await BarcodeDetector.getSupportedFormats(),f=SCAN_FMT.filter(x=>sup.includes(x));if(f.length)return await scanNative(d,f)}
     catch(e){if(/NotAllowed|Permission|NotFound|NotReadable/i.test((e?.name||'')+(e?.message||''))){qrStop();return toast('Caméra indisponible : '+(e.message||e.name)+' (autorisation caméra et HTTPS requis)',1)}
       if(NS){NS.stream.getTracks().forEach(t=>t.stop());NS=null}$('qr').innerHTML=''}}
@@ -419,7 +434,7 @@ function dl(name,blob){const a=document.createElement('a');a.href=URL.createObje
 async function backup(){try{toast('Sauvegarde en cours…');const T={};
   for(const [t,o] of [['articles','designation'],['clients','nom'],['reglements','created_at'],['bl','created_at']])T[t]=await all(t,o);
   dl('sauvegarde_'+new Date().toISOString().slice(0,16).replace(/[:T]/g,'-')+'.json',new Blob([JSON.stringify({app:'bl-vente',version:1,date:new Date().toISOString(),tables:T})],{type:'application/json'}));
-  toast(`Sauvegarde : ${T.articles.length} articles, ${T.clients.length} clients, ${T.bl.length} BL, ${T.reglements.length} règlements`)}catch(e){toast('Sauvegarde : '+e.message,1)}}
+  toast(`Sauvegarde : ${T.articles.length} articles, ${T.clients.length} clients, ${T.bl.length} BL, ${T.reglements.length} règlements`);return true}catch(e){toast('Sauvegarde : '+e.message,1);return false}}
 async function restore(file){try{const j=JSON.parse(await file.text()),T=j.tables;if(j.app!=='bl-vente'||!T)throw new Error('Fichier de sauvegarde invalide');
   if(!confirm(`Restaurer ${T.articles.length} articles, ${T.clients.length} clients, ${T.bl.length} BL et ${T.reglements.length} règlements ?\n\nLes articles et clients de la sauvegarde remplacent ceux qui existent déjà. Les BL et règlements déjà présents sont conservés.`))return;
   toast('Restauration en cours…');const up=async(t,r,o)=>{for(let i=0;i<r.length;i+=300)await rd(sb.from(t).upsert(r.slice(i,i+300),o))};
@@ -453,13 +468,24 @@ async function stkValid(){const inv=$('smode').value==='inventaire';
     p.date=new Date().toISOString();QUEUE.push({type:'stock',p});p.lignes.forEach(l=>{const a=articles.find(x=>x.id===l.id);if(a)a.stock=r3(inv?l.qte:Number(a.stock)+l.qte)});
     await saveQ();await saveLocal();SL=[];$('snote').value='';toast('Hors ligne : entrée enregistrée, synchronisation au retour du réseau');netUI();stkRender();renderArt()}}
 
+function razStock(){
+  if(!isAdmin())return toast('Réservé à l\'administrateur',1);
+  if(QUEUE.length)return toast('Synchronisez d\'abord les opérations en attente',1);
+  modal('Remise à zéro de tous les stocks','<p class="neg">⚠️ Le stock de TOUS les articles sera remis à 0. Une sauvegarde sera téléchargée avant.</p><div class="fg"><label>Mot de passe de votre compte</label><input id="rz_pw" type="password" autocomplete="current-password"></div>',async()=>{
+    const pw=$('rz_pw').value;if(!pw)return toast('Saisissez votre mot de passe',1);if(!navigator.onLine)return toast('Connexion internet requise',1);
+    const em=(await sb.auth.getUser()).data?.user?.email;if(!em)return toast('Session introuvable : reconnectez-vous',1);
+    const {error}=await sb.auth.signInWithPassword({email:em,password:pw});if(error)return toast('Mot de passe incorrect',1);
+    if(!confirm('Dernière confirmation : remettre TOUS les stocks à zéro ?'))return;
+    if(!await backup())return toast('Sauvegarde impossible : remise à zéro annulée',1);
+    try{const n=await rd(sb.rpc('remise_a_zero_stock',{p:{vendeur:me.nom}}));closeModal();toast('Stocks remis à zéro ('+n+' article(s) modifié(s))');loadAll()}catch(e){toast(e.message,1)}})}
+
 // ── Événements ──
 const A={logout:async()=>{if(QUEUE.length&&!confirm(QUEUE.length+' opération(s) pas encore synchronisée(s) restent sur cet appareil. Se déconnecter quand même ?'))return;try{await IDB.set('user',null)}catch{}try{await sb.auth.signOut()}catch{}location.reload()},
   install:async()=>{if(!IP)return;IP.prompt();await IP.userChoice;IP=null;$('inst').hidden=true},
   sync:async()=>{if(QUEUE.length){const n=await syncQueue();if(n&&!QUEUE.length)loadAll()}else loadAll()},refresh:async()=>{await loadAll();toast('Actualisé')},close:closeModal,
   pickA,inc:d=>{panier[d.i].qte++;cart()},dec:d=>{if(--panier[d.i].qte<=0)panier.splice(d.i,1);cart()},rm:d=>{panier.splice(d.i,1);cart()},valider,cancel:reset,
   edit:d=>formModal(articles.find(x=>x.id===d.id)),add:()=>formModal(),del:d=>del(d.id),
-  addC:()=>cliModal(),jp,jx,jf,jt:()=>jtick(),jc,btpair,scan,scanx:()=>qrStop(),torch,spick:d=>{stkPick(articles.find(x=>x.id===d.id));$('sq').value='';$('ddq').hidden=true;$('sq').focus()},gostk:()=>go('stk'),send:sendBL,sw:sendWA,sm:sendMail,sp:sendPdf,svalid:stkValid,sinc:d=>{SL[d.i].qte++;stkRender()},sdec:d=>{SL[d.i].qte=Math.max(0,SL[d.i].qte-1);stkRender()},srm:d=>{SL.splice(d.i,1);stkRender()},cdebt:()=>{debtOnly=!debtOnly;renderCli()},xl:d=>exportXlsx(d.t),bak:backup,rest:()=>$('fr').click(),imp:d=>{$('fi').dataset.t=d.t;$('fi').click()},
+  addC:()=>cliModal(),jp,jx,jf,jt:()=>jtick(),jc,btpair,scan,scanx:()=>qrStop(),torch,camsw,raz:razStock,spick:d=>{stkPick(articles.find(x=>x.id===d.id));$('sq').value='';$('ddq').hidden=true;$('sq').focus()},gostk:()=>go('stk'),send:sendBL,sw:sendWA,sm:sendMail,sp:sendPdf,svalid:stkValid,sinc:d=>{SL[d.i].qte++;stkRender()},sdec:d=>{SL[d.i].qte=Math.max(0,SL[d.i].qte-1);stkRender()},srm:d=>{SL.splice(d.i,1);stkRender()},cdebt:()=>{debtOnly=!debtOnly;renderCli()},xl:d=>exportXlsx(d.t),bak:backup,rest:()=>$('fr').click(),imp:d=>{$('fi').dataset.t=d.t;$('fi').click()},
   delAll:async d=>{if(!confirm('Supprimer TOUS les '+d.t+' ? Cette action est définitive.'))return;const {error}=await sb.from(d.t).delete().not('id','is',null);if(error)return toast(error.message,1);toast('Supprimé');loadAll()},editC:d=>cliModal(clients.find(x=>x.id===d.id)),reg:d=>regModal(clients.find(x=>x.id===d.id)),delC:d=>delC(d.id),
   tick:d=>tick(bls.find(c=>c.id===d.id)),editBL,delBL};
 document.addEventListener('click',e=>{if(!e.target.closest('.dd-wrap')){$('dda').hidden=true;$('ddq').hidden=true}
