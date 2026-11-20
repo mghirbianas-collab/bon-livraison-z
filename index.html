@@ -68,6 +68,10 @@ input,textarea,select{width:100%;padding:8px 10px;border:1.5px solid #e0e5ea;bor
 
 <div id="p_art" class="page"><div class="card"><div class="bar"><h3>📦 Articles <small id="ac"></small></h3><input id="as" placeholder="🔍 Réf. ou désignation…" style="width:200px"><button class="btn s sm" data-act="scan" data-t="as" title="Scanner un code">📷</button>
 <button class="btn s sm adm" data-act="gostk">📲 Entrée de stock</button><button class="btn s sm" data-act="xl" data-t="articles">📤 Excel</button><button class="btn s sm adm" data-act="imp" data-t="articles">📥 Importer</button><button class="btn g sm adm" data-act="add">➕ Nouveau</button></div><div id="art"></div><div class="adm" style="margin-top:12px"><button class="btn r sm" data-act="delAll" data-t="articles">🗑️ Supprimer tous les articles</button></div></div></div>
+<div id="p_rel" class="page"><div class="card"><div class="bar"><h3 id="rt">📄 Relevé client</h3><button class="btn s sm" data-go="cli">← Clients</button></div>
+<div class="bar"><label>Du <input type="date" id="rd1" style="width:150px"></label><label>Au <input type="date" id="rd2" style="width:150px"></label>
+<button class="btn s sm" data-act="rp" data-d="all">Tout</button><button class="btn s sm" data-act="rp" data-d="m">Ce mois</button><button class="btn s sm" data-act="rp" data-d="30">30 jours</button><button class="btn s sm" data-act="rp" data-d="y">Cette année</button></div>
+<div class="bar"><button class="btn g sm" data-act="rpdf">📄 PDF</button><button class="btn g sm" data-act="rsend">💬 Envoyer</button><button class="btn s sm" data-act="rtk">🖨️ Ticket</button></div><div id="rel"></div></div></div>
 <div id="p_stk" class="page"><div class="card"><h3>📲 Entrée de stock (type PDA)</h3>
 <select id="smode"><option value="ajout">➕ Entrée de stock : les quantités s'ajoutent au stock</option><option value="inventaire">📋 Inventaire : les quantités remplacent le stock</option></select>
 <div style="display:flex;gap:6px;margin-top:8px"><div class="dd-wrap" style="flex:1"><input id="sq" placeholder="Scannez, ou cherchez par référence / désignation…" autocomplete="off"><div id="ddq" class="dd" hidden></div></div><button class="btn g" data-act="scan" data-t="stk" title="Scanner avec la caméra">📷</button></div>
@@ -79,7 +83,11 @@ input,textarea,select{width:100%;padding:8px 10px;border:1.5px solid #e0e5ea;bor
 <div class="bar"><label>Du <input type="date" id="jd1" style="width:150px"></label><label>Au <input type="date" id="jd2" style="width:150px"></label>
 <button class="btn s sm" data-act="jp" data-d="0">Aujourd'hui</button><button class="btn s sm" data-act="jp" data-d="1">Hier</button><button class="btn s sm" data-act="jp" data-d="7">7 jours</button><button class="btn s sm" data-act="jp" data-d="m">Ce mois</button></div>
 <div class="bar"><button class="btn g sm" data-act="jx">📊 Excel</button><button class="btn g sm" data-act="jf">📄 PDF</button><button class="btn g sm" data-act="jc">🗂️ Copies des BL (PDF)</button><button class="btn s sm" data-act="jt">🖨️ Ticket</button></div><div id="jr"></div></div></div>
-<div id="p_usr" class="page"><div class="card"><h3>💾 Sauvegarde et restauration</h3><p class="mut">La sauvegarde contient les articles (avec stock), les clients, tous les BL et les règlements. Le fichier est enregistré dans le dossier Téléchargements de votre téléphone ou PC.</p><div class="bar"><button class="btn g" data-act="bak">💾 Sauvegarder toutes les données</button><button class="btn s" data-act="rest">📂 Restaurer une sauvegarde</button></div></div><div class="card"><h3>🧹 Remise à zéro des stocks</h3><p class="mut">Remet le stock de tous les articles à 0. Votre mot de passe de connexion est demandé, et une sauvegarde est téléchargée automatiquement avant.</p><button class="btn r" data-act="raz">🧹 Remettre tous les stocks à zéro</button></div><div class="card"><h3>🔑 Utilisateurs et rôles</h3><p class="mut">Créez les comptes dans Supabase (Authentication > Users) : ils apparaissent ici avec le rôle « Utilisateur ».</p><div id="usr"></div></div></div>
+<div id="p_usr" class="page"><div class="card"><h3>💾 Sauvegarde et restauration</h3><p class="mut">La sauvegarde contient les articles (avec stock), les clients, tous les BL et les règlements. Le fichier est enregistré dans le dossier Téléchargements de votre téléphone ou PC.</p><div class="bar"><button class="btn g" data-act="bak">💾 Sauvegarder toutes les données</button><button class="btn s" data-act="rest">📂 Restaurer une sauvegarde</button></div></div><div class="card"><h3>🧾 En-tête et pied du ticket</h3><p class="mut">Une ligne de texte par ligne imprimée (nom du magasin, adresse, téléphone, message de remerciement…). Ces textes s'impriment sur les tickets, les PDF et les messages WhatsApp.</p>
+<div class="fg"><label>En-tête (haut du ticket)</label><textarea id="set_h" rows="4" placeholder="MON MAGASIN&#10;Adresse&#10;Tél : …"></textarea></div>
+<div class="fg"><label>Pied de ticket (bas du ticket)</label><textarea id="set_f" rows="3"></textarea></div>
+<div class="bar"><button class="btn g" data-act="setsave">💾 Enregistrer</button><button class="btn s" data-act="settest">🖨️ Ticket test</button></div></div>
+<div class="card"><h3>🧹 Remise à zéro des stocks</h3><p class="mut">Remet le stock de tous les articles à 0. Votre mot de passe de connexion est demandé, et une sauvegarde est téléchargée automatiquement avant.</p><button class="btn r" data-act="raz">🧹 Remettre tous les stocks à zéro</button></div><div class="card"><h3>🔑 Utilisateurs et rôles</h3><p class="mut">Créez les comptes dans Supabase (Authentication > Users) : ils apparaissent ici avec le rôle « Utilisateur ».</p><div id="usr"></div></div></div>
 <div id="p_cli" class="page"><div class="card"><div class="bar"><h3>👥 Clients <small id="cc"></small></h3><input id="cq" placeholder="🔍 Nom, code, tél., matricule…" style="width:200px"><button class="btn s sm" data-act="scan" data-t="cq" title="Scanner un code">📷</button><button class="btn s sm" id="cdb" data-act="cdebt">💳 Clients avec solde</button><button class="btn s sm" data-act="xl" data-t="clients">📤 Excel</button><button class="btn s sm" data-act="imp" data-t="clients">📥 Importer</button><button class="btn g sm" data-act="addC">➕ Nouveau</button></div><div id="cli"></div><div class="adm" style="margin-top:12px"><button class="btn r sm" data-act="delAll" data-t="clients">🗑️ Supprimer tous les clients</button></div></div></div>
 <input type="file" id="fi" accept=".xlsx,.xls,.csv" hidden><input type="file" id="fr" accept=".json,application/json" hidden>
 </div>
@@ -93,7 +101,7 @@ input,textarea,select{width:100%;padding:8px 10px;border:1.5px solid #e0e5ea;bor
 <script>
 // ⚠️ À remplacer par les valeurs de votre NOUVEAU projet Supabase
 const SUPABASE_URL='https://qdsxoufmftkqtpovvkjp.supabase.co', SUPABASE_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFkc3hvdWZtZnRrcXRwb3Z2a2pwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTQzMTI5NTAsImV4cCI6MjEwOTg4ODk1MH0.FwA7oMovnx_Q6fyH9QQwn-ArHEhF_JnY-iqiVzH61Bc';
-const FOOTER='© Anas SABEUR — Tél : 52296392';
+const FOOTER='© Anas MGHIRBI — Tél : 98754193';
 const sb=supabase.createClient(SUPABASE_URL,SUPABASE_KEY,{global:{fetch:(u,o={})=>fetch(u,o.signal?o:{...o,signal:AbortSignal.timeout(15000)})}});
 const $=id=>document.getElementById(id);
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -114,12 +122,12 @@ const table=(h,r)=>r.length?`<div class="tw"><table><thead><tr>${h.map(x=>x==='#
 const IDB=(()=>{let d;const o=()=>d||(d=new Promise((ok,ko)=>{const r=indexedDB.open('bl-vente',1);r.onupgradeneeded=()=>r.result.createObjectStore('kv');r.onsuccess=()=>ok(r.result);r.onerror=()=>ko(r.error)}));
   return {get:async k=>{const db=await o();return new Promise((ok,ko)=>{const q=db.transaction('kv').objectStore('kv').get(k);q.onsuccess=()=>ok(q.result);q.onerror=()=>ko(q.error)})},
     set:async(k,v)=>{const db=await o();return new Promise((ok,ko)=>{const t=db.transaction('kv','readwrite');t.objectStore('kv').put(v,k);t.oncomplete=ok;t.onerror=()=>ko(t.error)})}}})();
-let QUEUE=[],NET=true,syncing=false;
+let QUEUE=[],NET=true,syncing=false,SET={entete:'',pied:null};
 const sortNew=l=>l.sort((a,b)=>String(b.created_at||'').localeCompare(String(a.created_at||''))||String(a.designation||a.nom||'').localeCompare(String(b.designation||b.nom||'')));
 const isNet=e=>!navigator.onLine||/fetch|network|offline|load failed|timed out|timeout|abort/i.test(String(e?.message||e||''));
 const uid=()=>crypto.randomUUID?crypto.randomUUID():'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g,c=>{const r=Math.random()*16|0;return (c==='x'?r:r&3|8).toString(16)});
-const saveQ=()=>IDB.set('queue',QUEUE).catch(()=>{}),saveLocal=()=>IDB.set('data',{articles,clients,bls:bls.slice(0,300)}).catch(()=>{});
-async function loadLocal(){const d=await IDB.get('data').catch(()=>null);if(!d)return false;articles=d.articles||[];clients=d.clients||[];bls=d.bls||[];sortNew(articles);sortNew(clients);return true}
+const saveQ=()=>IDB.set('queue',QUEUE).catch(()=>{}),saveLocal=()=>IDB.set('data',{articles,clients,bls:bls.slice(0,300),set:SET}).catch(()=>{});
+async function loadLocal(){const d=await IDB.get('data').catch(()=>null);if(!d)return false;articles=d.articles||[];clients=d.clients||[];bls=d.bls||[];if(d.set)SET=d.set;sortNew(articles);sortNew(clients);return true}
 function netUI(){const e=$('net');if(!e)return;const off=!navigator.onLine||!NET;e.textContent=(off?'⚠️ Hors ligne':'🟢 En ligne')+(QUEUE.length?' · '+QUEUE.length+' en attente':'');e.style.color=off||QUEUE.length?'#f59e0b':''}
 async function syncQueue(){if(syncing||!QUEUE.length||!me)return 0;syncing=true;let n=0;
   try{while(QUEUE.length){const it=QUEUE[0];
@@ -143,7 +151,7 @@ async function start(u){
   me=data||await IDB.get('me').catch(()=>null)||{id:u.id,nom:u.email,role:'user'};if(data){IDB.set('me',me).catch(()=>{});IDB.set('user',{id:u.id,email:u.email}).catch(()=>{})}
   QUEUE=(await IDB.get('queue').catch(()=>null))||[];
   $('login').hidden=true;$('app').hidden=false;document.body.classList.toggle('admin',isAdmin());
-  $('who').textContent=me.nom+(isAdmin()?' · admin':' · utilisateur')+' · v8';btRestore();go('cmd');cart();await loadAll()}
+  $('who').textContent=me.nom+(isAdmin()?' · admin':' · utilisateur')+' · v9';btRestore();go('cmd');cart();await loadAll()}
 (async()=>{let r={};try{r=await sb.auth.getSession()}catch(e){r={error:e}}
   if(r.data?.session)return start(r.data.session.user);
   const u=await IDB.get('user').catch(()=>null);if(u&&(!navigator.onLine||isNet(r.error)))start(u)})();
@@ -153,14 +161,14 @@ async function all(t,o){let r=[],i=0;for(;;){const d=await rd(sb.from(t).select(
 async function loadAll(){
   if(QUEUE.length&&navigator.onLine)await syncQueue();
   if(QUEUE.length){await loadLocal();NET=false}
-  else{try{[articles,clients,bls]=await Promise.all([all('articles','designation'),all('clients_solde','nom'),rd(sb.from('bl').select('*').order('created_at',{ascending:false}).limit(300))]);NET=true;sortNew(articles);sortNew(clients);saveLocal()}
+  else{try{[articles,clients,bls]=await Promise.all([all('articles','designation'),all('clients_solde','nom'),rd(sb.from('bl').select('*').order('created_at',{ascending:false}).limit(300))]);NET=true;sortNew(articles);sortNew(clients);await loadSettings();saveLocal()}
     catch(e){NET=false;const ok=await loadLocal();toast(isNet(e)?(ok?'Mode hors ligne : données locales':'Hors ligne : aucune donnée locale (connectez-vous une première fois avec internet)'):'Chargement impossible : '+e.message,!ok||!isNet(e))}}
   netUI();render()}
 function render(){renderHist();renderArt();renderCli();cinfo();cart()}
 const MP={especes:'💵 Espèces',cheque:'🧾 Chèque',credit:'⏳ Crédit'},MT={especes:'Espèces',cheque:'Chèque',credit:'Crédit'};
 async function loadUsers(){try{const u=await rd(sb.from('profiles').select('*').order('nom'));
   $('usr').innerHTML=table(['Nom','Email','Rôle'],u.map(x=>`<tr><td><b>${esc(x.nom)}</b></td><td>${esc(x.email)}</td><td><select data-u="${x.id}" ${x.id===me.id?'disabled':''}><option value="user" ${x.role==='user'?'selected':''}>Utilisateur</option><option value="admin" ${x.role==='admin'?'selected':''}>Administrateur</option></select></td></tr>`))}catch(e){toast(e.message,1)}}
-function go(p){if(p==='usr')loadUsers();if(p==='jr')loadJournal();if(p==='stk'){stkRender();setTimeout(()=>$('sq')?.focus(),80)}document.querySelectorAll('.page').forEach(x=>x.classList.toggle('on',x.id==='p_'+p));document.querySelectorAll('.nb[data-go]').forEach(x=>x.classList.toggle('on',x.dataset.go===p))}
+function go(p){if(p==='usr'){loadUsers();setFill()}if(p==='jr')loadJournal();if(p==='stk'){stkRender();setTimeout(()=>$('sq')?.focus(),80)}document.querySelectorAll('.page').forEach(x=>x.classList.toggle('on',x.id==='p_'+p));document.querySelectorAll('.nb[data-go]').forEach(x=>x.classList.toggle('on',x.dataset.go===p))}
 const stk=a=>`<span class="${a.stock<=0?'neg':''}">${r3(a.stock)}</span>`;
 
 function renderArt(){const l=articles.filter(a=>match((a.reference||'')+' '+a.designation,$('as').value));$('ac').textContent=`(${articles.length})`;
@@ -206,11 +214,11 @@ function enc(t){const o=[];for(const ch of String(t??'').normalize('NFC').replac
 const wrap=(t,w)=>{const r=[];let s=String(t??'').normalize('NFC');while(s.length>w){let i=s.lastIndexOf(' ',w);if(i<=0)i=w;r.push(s.slice(0,i));s=s.slice(i).trimStart()}r.push(s);return r};
 const lr=(a,b,w)=>{a=String(a);b=String(b);if(a.length+b.length>=w)a=a.slice(0,Math.max(0,w-b.length-1));return a.padEnd(w-b.length)+b};
 function escp(W,fn){const o=[27,64,27,116,0],H='-'.repeat(W),T=s=>o.push(...enc(s),10),C=a=>o.push(...a),L=(a,b)=>T(lr(a,b,W));fn({T,C,H,L});C([27,100,4]);return Uint8Array.from(o)}
-const escBL=(b,W)=>escp(W,({T,C,H,L})=>{C([27,97,1,27,69,1,29,33,17]);T('BON DE LIVRAISON');C([29,33,0]);T(b.numero);C([27,69,0]);T(dt(b.created_at));C([27,97,0]);
+const escBL=(b,W)=>escp(W,({T,C,H,L})=>{C([27,97,1]);hdr().forEach(x=>wrap(x,W).forEach(y=>T(y)));C([27,97,1,27,69,1,29,33,17]);T('BON DE LIVRAISON');C([29,33,0]);T(b.numero);C([27,69,0]);T(dt(b.created_at));C([27,97,0]);
   T('Vendeur : '+(b.vendeur||''));if(b.client)T('Client : '+b.client);if(ci(b).matricule_fiscal)T('MF : '+ci(b).matricule_fiscal);if(ci(b).adresse)wrap('Adresse : '+ci(b).adresse,W).forEach(x=>T(x));T('Paiement : '+(MT[b.mode_paiement]||''));T(H);
   b.lignes.forEach(l=>{wrap(l.designation,W).forEach(x=>T(x));L(l.qte+' x '+r3(l.prix).toFixed(3),r3(l.total).toFixed(3))});
-  T(H);C([27,69,1,29,33,1]);L('TOTAL',fmt(b.total));C([29,33,0,27,69,0]);if(b.notes)wrap(b.notes,W).forEach(x=>T(x));T(H);C([27,97,1]);T('Merci de votre confiance');T(FOOTER)});
-const escJ=(o,W)=>escp(W,({T,C,H,L})=>{C([27,97,1,27,69,1]);T('JOURNAL DES VENTES');C([27,69,0]);T('Du '+fd(J.from)+' au '+fd(J.to));T('Imprimé le '+dt(new Date()));C([27,97,0]);T(H);
+  T(H);C([27,69,1,29,33,1]);L('TOTAL',fmt(b.total));C([29,33,0,27,69,0]);if(b.notes)wrap(b.notes,W).forEach(x=>T(x));T(H);C([27,97,1]);ftr().forEach(x=>wrap(x,W).forEach(y=>T(y)))});
+const escJ=(o,W)=>escp(W,({T,C,H,L})=>{C([27,97,1]);hdr().forEach(x=>wrap(x,W).forEach(y=>T(y)));C([27,97,1,27,69,1]);T('JOURNAL DES VENTES');C([27,69,0]);T('Du '+fd(J.from)+' au '+fd(J.to));T('Imprimé le '+dt(new Date()));C([27,97,0]);T(H);
   L('Nombre de BL',o.nb);L('Total ventes',fmt(o.total));T(H);L('Ventes espèces',fmt(o.especes));L('Ventes chèque',fmt(o.cheque));L('Ventes crédit',fmt(o.credit));L('Règl. espèces',fmt(o.re));L('Règl. chèque',fmt(o.rc));T(H);
   L('Espèces encaissé',fmt(o.ee));L('Chèques encaissé',fmt(o.ec));C([27,69,1,29,33,1]);L('ENCAISSÉ',fmt(o.enc));C([29,33,0,27,69,0]);if(isAdmin()){T(H);L('Marge',fmt(o.marge))}});
 async function btRestore(){if(BT?.dev||!navigator.bluetooth?.getDevices)return;try{const l=await navigator.bluetooth.getDevices(),n=localStorage.btname,d=l.find(x=>x.name===n)||l[0];if(d){BT={dev:d,ch:null};$('btb').classList.add('on')}}catch{}}
@@ -229,9 +237,9 @@ async function btpair(){
   if(BT?.dev){if(!confirm("Imprimante connectée ("+(BT.dev.name||'Bluetooth')+"). La déconnecter et revenir à l'impression par le navigateur ?"))return;try{BT.dev.gatt.disconnect()}catch{}BT=null;try{localStorage.removeItem('btok')}catch{}$('btb').classList.remove('on');return toast("Retour à l'impression par le navigateur")}
   try{await btConnect(true);try{localStorage.btok='1';localStorage.btname=BT.dev.name||''}catch{}$('btb').classList.add('on');toast('Imprimante connectée : '+(BT.dev.name||''));await btSend(escp(pw(),({T,C})=>{C([27,97,1]);T('Imprimante connectee');T(BT.dev.name||'')}))}catch(e){BT=null;btErr(e)}}
 
-function tick(b,w){if(pmode()==='rawbt')return rawbt(escBL(b,pw()));if(!w&&!BT?.dev&&btSaved())return btRestore().then(()=>tick(b,1));if(BT?.dev)return btSend(escBL(b,pw())).catch(btErr);$('tk').innerHTML=`<h2>BON DE LIVRAISON</h2><p class="c">${esc(b.numero)}<br>${dt(b.created_at)}</p><p>Vendeur : ${esc(b.vendeur)}${b.client?'<br>Client : '+esc(b.client):''}${ci(b).matricule_fiscal?'<br>MF : '+esc(ci(b).matricule_fiscal):''}${ci(b).adresse?'<br>Adresse : '+esc(ci(b).adresse):''}<br>Paiement : ${MT[b.mode_paiement]||''}</p><hr>`
+function tick(b,w){if(pmode()==='rawbt')return rawbt(escBL(b,pw()));if(!w&&!BT?.dev&&btSaved())return btRestore().then(()=>tick(b,1));if(BT?.dev)return btSend(escBL(b,pw())).catch(btErr);$('tk').innerHTML=`${hdr().map(x=>'<p class="c">'+esc(x)+'</p>').join('')}<h2>BON DE LIVRAISON</h2><p class="c">${esc(b.numero)}<br>${dt(b.created_at)}</p><p>Vendeur : ${esc(b.vendeur)}${b.client?'<br>Client : '+esc(b.client):''}${ci(b).matricule_fiscal?'<br>MF : '+esc(ci(b).matricule_fiscal):''}${ci(b).adresse?'<br>Adresse : '+esc(ci(b).adresse):''}<br>Paiement : ${MT[b.mode_paiement]||''}</p><hr>`
   +b.lignes.map(l=>`<div><b>${esc(l.designation)}</b><div class="r"><span>${l.qte} x ${r3(l.prix).toFixed(3)}</span><span>${r3(l.total).toFixed(3)}</span></div></div>`).join('')
-  +`<hr><div class="r t"><span>TOTAL</span><span>${fmt(b.total)}</span></div>${b.notes?'<p>'+esc(b.notes)+'</p>':''}<hr><p class="c">Merci de votre confiance<br>${esc(FOOTER)}</p>`;pr()}
+  +`<hr><div class="r t"><span>TOTAL</span><span>${fmt(b.total)}</span></div>${b.notes?'<p>'+esc(b.notes)+'</p>':''}<hr><p class="c">${ftr().map(esc).join('<br>')}</p>`;pr()}
 
 // ── Journal de vente ──
 let J=null;
@@ -276,7 +284,7 @@ function jf(){if(!J)return toast("Ouvrez d'abord le journal",1);const {jsPDF}=wi
   jsecs().filter(s=>!s.x).forEach(s=>{let y=d.lastAutoTable.finalY+10;if(y>265){d.addPage();y=16}d.setFontSize(11);d.text(s.t,14,y);
     d.autoTable({startY:y+3,head:[s.head],body:s.rows.map(r=>r.map((v,i)=>fm(v,s.k[i]))),styles:{fontSize:8},headStyles:H,columnStyles:Object.fromEntries([...s.k].map((c,i)=>[i,{halign:c==='d'?'left':'right'}])),didParseCell:h=>{if(h.section==='body'&&h.row.raw[0]==='TOTAL')h.cell.styles.fontStyle='bold'}})});
   d.save(`Journal_${J.from}_${J.to}.pdf`)}
-function blPage(d,b){const c=clients.find(x=>x.id===b.client_id);
+function blPage(d,b){const c=clients.find(x=>x.id===b.client_id);{const h=hdr().slice(0,4);if(h.length){d.setFontSize(9);d.text(h,196,12,{align:'right'})}}
     d.setFontSize(18);d.text('BON DE LIVRAISON',14,18);d.setFontSize(10);d.text('(copie)',14,24);
     d.setFontSize(11);d.text('N° '+b.numero,14,32);d.text('Date : '+dt(b.created_at),14,38);d.text('Vendeur : '+(b.vendeur||''),14,44);
     d.text('Client : '+(b.client||'Comptoir'),115,32);let y=38;
@@ -284,10 +292,10 @@ function blPage(d,b){const c=clients.find(x=>x.id===b.client_id);
     d.autoTable({startY:Math.max(52,y+6),head:[['Article','Réf.','Qté','Prix unit.','Total']],body:b.lignes.map(l=>[l.designation,l.reference||'',r3(l.qte),r3(l.prix).toFixed(3),r3(l.total).toFixed(3)]),styles:{fontSize:9},headStyles:{fillColor:[30,45,61]},columnStyles:{2:{halign:'right'},3:{halign:'right'},4:{halign:'right'}}});
     y=d.lastAutoTable.finalY+9;if(y>270){d.addPage();y=20}d.setFontSize(13);d.text('TOTAL : '+fmt(b.total),196,y,{align:'right'});
     if(b.notes){d.setFontSize(9);d.text(d.splitTextToSize('Notes : '+b.notes,180),14,y+8)}}
-function blFoot(d){const n=d.getNumberOfPages();for(let p=1;p<=n;p++){d.setPage(p);d.setFontSize(8);d.text(FOOTER+'  ·  Page '+p+'/'+n,105,290,{align:'center'})}}
-const blText=(b,w)=>{const B=x=>w?'*'+x+'*':x,L=[B('BON DE LIVRAISON'),'N° '+b.numero,'Date : '+dt(b.created_at),'Client : '+(b.client||'Comptoir'),'Paiement : '+(MX[b.mode_paiement]||''),'------------------------------',
+function blFoot(d){const n=d.getNumberOfPages();for(let p=1;p<=n;p++){d.setPage(p);d.setFontSize(8);d.text(ftr().join('  ·  ')+'  ·  Page '+p+'/'+n,105,290,{align:'center'})}}
+const blText=(b,w)=>{const B=x=>w?'*'+x+'*':x,L=[...hdr(),B('BON DE LIVRAISON'),'N° '+b.numero,'Date : '+dt(b.created_at),'Client : '+(b.client||'Comptoir'),'Paiement : '+(MX[b.mode_paiement]||''),'------------------------------',
   ...b.lignes.map(l=>l.designation+'\n   '+r3(l.qte)+' x '+r3(l.prix).toFixed(3)+' = '+r3(l.total).toFixed(3)),'------------------------------',B('TOTAL : '+fmt(b.total))];
-  if(b.notes)L.push(b.notes);L.push('','Merci de votre confiance',FOOTER);return L.join('\n')};
+  if(b.notes)L.push(b.notes);L.push('',...ftr());return L.join('\n')};
 const waNum=t=>{let n=String(t||'').split(/[\/,;]/)[0].replace(/\D/g,'');if(n.startsWith('00'))n=n.slice(2);if(n.length===8)n='216'+n;return n};
 function sendBL(d){const b=bls.find(x=>x.id===d.id),c=ci(b);
   modal('Envoyer '+b.numero,`<p class="mut">${esc(b.client||'Comptoir')}${c.telephone?' · '+esc(c.telephone):''}${c.email?' · '+esc(c.email):''}</p><div style="display:grid;gap:8px"><button class="btn g" data-act="sw" data-id="${b.id}">💬 WhatsApp (message)</button><button class="btn s" data-act="sm" data-id="${b.id}">✉️ E-mail</button><button class="btn s" data-act="sp" data-id="${b.id}">📎 Partager le PDF (WhatsApp, e-mail…)</button></div>`,closeModal);$('mok').hidden=true}
@@ -299,10 +307,10 @@ async function sendPdf(d){const b=bls.find(x=>x.id===d.id);closeModal();const {j
 function jc(){if(!J)return toast("Ouvrez d'abord le journal",1);if(!J.bl.length)return toast('Aucun BL sur cette période',1);
   const {jsPDF}=window.jspdf,d=new jsPDF();
   J.bl.forEach((b,i)=>{if(i)d.addPage();blPage(d,b)});
-  const n=d.getNumberOfPages();for(let p=1;p<=n;p++){d.setPage(p);d.setFontSize(8);d.text(FOOTER+'  ·  Page '+p+'/'+n,105,290,{align:'center'})}
+  const n=d.getNumberOfPages();for(let p=1;p<=n;p++){d.setPage(p);d.setFontSize(8);d.text(ftr().join('  ·  ')+'  ·  Page '+p+'/'+n,105,290,{align:'center'})}
   d.save(`Copies_BL_${J.from}_${J.to}.pdf`)}
 function jtick(w){if(pmode()==='rawbt'&&J)return rawbt(escJ(jstat(J.bl,J.rg),pw()));if(!w&&!BT?.dev&&btSaved())return btRestore().then(()=>jtick(1));if(BT?.dev&&J)return btSend(escJ(jstat(J.bl,J.rg),pw())).catch(btErr);if(!J)return toast("Ouvrez d'abord le journal",1);const o=jstat(J.bl,J.rg),L=(a,b)=>`<div class="r"><span>${a}</span><span>${b}</span></div>`;
-  $('tk').innerHTML=`<h2>JOURNAL DES VENTES</h2><p class="c">Du ${fd(J.from)} au ${fd(J.to)}<br>Imprimé le ${dt(new Date())}</p><hr>`+L('Nombre de BL',o.nb)+L('Total ventes',fmt(o.total))+'<hr>'
+  $('tk').innerHTML=`${hdr().map(x=>'<p class="c">'+esc(x)+'</p>').join('')}<h2>JOURNAL DES VENTES</h2><p class="c">Du ${fd(J.from)} au ${fd(J.to)}<br>Imprimé le ${dt(new Date())}</p><hr>`+L('Nombre de BL',o.nb)+L('Total ventes',fmt(o.total))+'<hr>'
   +L('Ventes espèces',fmt(o.especes))+L('Ventes chèque',fmt(o.cheque))+L('Ventes crédit',fmt(o.credit))+L('Règl. espèces',fmt(o.re))+L('Règl. chèque',fmt(o.rc))+'<hr>'
   +L('Espèces encaissé',fmt(o.ee))+L('Chèques encaissé',fmt(o.ec))+`<div class="r t"><span>ENCAISSÉ</span><span>${fmt(o.enc)}</span></div>`+(isAdmin()?'<hr>'+L('Marge',fmt(o.marge)):'');pr()}
 
@@ -371,7 +379,7 @@ function onScan(code,t){code=String(code).trim();if(t==='stk')return stkAdd(code
 let debtOnly=false;
 function renderCli(){$('cdb').textContent=debtOnly?'👥 Tous les clients':'💳 Clients avec solde';const l=(debtOnly?clients.filter(c=>c.solde>0.0005).sort((a,b)=>b.solde-a.solde):clients).filter(c=>match((c.code||'')+' '+c.nom+' '+(c.telephone||'')+' '+(c.matricule_fiscal||''),$('cq').value)),d=clients.reduce((s,c)=>s+Number(c.solde),0);
   $('cc').textContent=`(${clients.length}) · crédits dus : ${fmt(d)}`;$('cls').innerHTML=clients.map(c=>`<option value="${esc(c.nom)}">`).join('');
-  $('cli').innerHTML=table(['Code','Nom','Solde','','Mat. fiscal','Tél.'],l.slice(0,100).map(c=>`<tr><td class="mono">${esc(c.code)}</td><td><b>${esc(c.nom)}</b>${c.adresse?`<br><small>${esc(c.adresse)}</small>`:''}</td><td class="nw ${c.solde>0?'neg':'pr'}">${fmt(c.solde)}</td><td class="nw"><button class="btn g sm" data-act="reg" data-id="${c.id}">💰 Règlement</button> <button class="btn s sm" data-act="editC" data-id="${c.id}">✏️</button> <button class="btn r sm adm" data-act="delC" data-id="${c.id}">🗑️</button></td><td class="mono">${esc(c.matricule_fiscal)}</td><td class="nw">${esc(c.telephone)}</td></tr>`))}
+  $('cli').innerHTML=table(['Code','Nom','Solde','','Mat. fiscal','Tél.'],l.slice(0,100).map(c=>`<tr><td class="mono">${esc(c.code)}</td><td><b>${esc(c.nom)}</b>${c.adresse?`<br><small>${esc(c.adresse)}</small>`:''}</td><td class="nw ${c.solde>0?'neg':'pr'}">${fmt(c.solde)}</td><td class="nw"><button class="btn g sm" data-act="reg" data-id="${c.id}">💰 Règlement</button> <button class="btn s sm" data-act="rel" data-id="${c.id}">📄 Relevé</button> <button class="btn s sm" data-act="editC" data-id="${c.id}">✏️</button> <button class="btn r sm adm" data-act="delC" data-id="${c.id}">🗑️</button></td><td class="mono">${esc(c.matricule_fiscal)}</td><td class="nw">${esc(c.telephone)}</td></tr>`))}
 function cinfo(){const n=norm($('cl').value.trim()),c=n&&clients.find(x=>norm(x.nom)===n);
   $('ci').innerHTML=c?`Client existant · solde : <b class="${c.solde>0?'neg':''}">${fmt(c.solde)}</b>`:n?'Nouveau client : il sera créé à la validation du BL.':''}
 const CF=[['code','Code'],['nom','Nom *'],['telephone','Téléphone'],['email','E-mail'],['matricule_fiscal','Matricule fiscal'],['adresse','Adresse']];
@@ -479,13 +487,80 @@ function razStock(){
     if(!await backup())return toast('Sauvegarde impossible : remise à zéro annulée',1);
     try{const n=await rd(sb.rpc('remise_a_zero_stock',{p:{vendeur:me.nom}}));closeModal();toast('Stocks remis à zéro ('+n+' article(s) modifié(s))');loadAll()}catch(e){toast(e.message,1)}})}
 
+// ── En-tête / pied de ticket, relevé client ──
+const hdr=()=>String(SET.entete||'').split('\n').map(x=>x.trim()).filter(Boolean);
+const ftr=()=>SET.pied===null?['Merci de votre visite',FOOTER]:String(SET.pied).split('\n').map(x=>x.trim()).filter(Boolean);
+async function loadSettings(){try{const r=await sb.from('parametres').select('*');if(r.error||!r.data)return;const g=k=>r.data.find(x=>x.cle===k);SET={entete:g('ticket_entete')?g('ticket_entete').valeur:'',pied:g('ticket_pied')?g('ticket_pied').valeur:null}}catch{}}
+function setFill(){$('set_h').value=SET.entete||'';$('set_f').value=SET.pied===null?ftr().join('\n'):SET.pied}
+async function setSave(){if(!isAdmin())return toast("Réservé à l'administrateur",1);if(!navigator.onLine)return toast('Connexion internet requise',1);
+  const h=$('set_h').value.trim(),f=$('set_f').value.trim(),{error}=await sb.from('parametres').upsert([{cle:'ticket_entete',valeur:h},{cle:'ticket_pied',valeur:f}],{onConflict:'cle'});
+  if(error)return toast(error.message,1);SET={entete:h,pied:f};saveLocal();toast('En-tête et pied du ticket enregistrés')}
+function setTest(){tick({id:'t',numero:'BL-TEST',created_at:new Date().toISOString(),vendeur:me.nom,client:'Client test',mode_paiement:'especes',total:30,marge:0,notes:'',lignes:[{designation:'Article test',qte:2,prix:15,pa:0,total:30}]})}
+
+let REL={c:null,bl:[],rg:[]};
+const fd2=d=>new Date(d).toLocaleDateString('fr-FR',{day:'2-digit',month:'2-digit',year:'2-digit'}),n3=x=>r3(x).toFixed(3),mvL=m=>(m.deb&&m.cre?'Comptant ':m.deb?'Débit ':'Crédit ')+n3(m.deb||m.cre);
+const relPer=R=>R.from||R.to?'Du '+(R.from?fd(R.from):'début')+' au '+(R.to?fd(R.to):"aujourd'hui"):'Toutes les opérations';
+const relFile=R=>'Releve_'+R.c.nom.replace(/[^\w]+/g,'_')+'_'+ymd(new Date())+'.pdf';
+function relOpen(d){REL={c:clients.find(x=>x.id===d.id),bl:[],rg:[]};$('rd1').value=$('rd2').value='';$('rel').innerHTML='';go('rel');relLoad()}
+async function relLoad(){const c=REL.c;$('rt').textContent='📄 Relevé : '+c.nom;
+  try{if(!navigator.onLine)throw new Error('offline');
+    const pg=async tb=>{let r=[],i=0;for(;;){const d=await rd(sb.from(tb).select('*').eq('client_id',c.id).order('created_at').range(i,i+999));r=r.concat(d);if(d.length<1000)return r;i+=1000}};
+    REL.bl=await pg('bl');REL.rg=await pg('reglements');REL.local=false}
+  catch(e){if(!isNet(e))return toast(e.message,1);REL.bl=bls.filter(b=>b.client_id===c.id);REL.rg=QUEUE.filter(q=>q.type==='reg'&&q.row.client_id===c.id).map(q=>q.row);REL.local=true}
+  renderRel()}
+function relRange(d){const n=new Date(),a=$('rd1'),b=$('rd2');if(d.d==='all')a.value=b.value='';
+  else{b.value=ymd(n);a.value=d.d==='m'?ymd(new Date(n.getFullYear(),n.getMonth(),1)):d.d==='y'?ymd(new Date(n.getFullYear(),0,1)):ymd(new Date(n.getFullYear(),n.getMonth(),n.getDate()-29))}renderRel()}
+function relData(){if(!REL.c)return null;const mv=[];
+  REL.bl.forEach(b=>{const t=Number(b.total);mv.push({d:b.created_at,op:'BL '+b.numero+' ('+(MX[b.mode_paiement]||'')+')',deb:t,cre:b.mode_paiement==='credit'?0:t})});
+  REL.rg.forEach(r=>mv.push({d:r.created_at,op:'Règlement '+(MX[r.mode]||r.mode)+(r.note?' - '+r.note:''),deb:0,cre:Number(r.montant)}));
+  mv.sort((a,b)=>a.d<b.d?-1:a.d>b.d?1:0);let s=0;mv.forEach(m=>{s=r3(s+m.deb-m.cre);m.s=s});
+  const f=$('rd1').value,t=$('rd2').value,day=m=>ymd(new Date(m.d)),rows=mv.filter(m=>(!f||day(m)>=f)&&(!t||day(m)<=t)),
+    before=f?mv.filter(m=>day(m)<f).pop():null,open=rows.length?r3(rows[0].s-rows[0].deb+rows[0].cre):(before?before.s:0),deb=r3(S(rows,m=>m.deb)),cre=r3(S(rows,m=>m.cre));
+  return {c:REL.c,from:f,to:t,rows,open,deb,cre,close:rows.length?rows[rows.length-1].s:open,solde:Number(REL.c.solde)}}
+function renderRel(){const R=relData();if(!R)return;const n=v=>v?fmt(v):'';
+  $('rel').innerHTML=(REL.local?'<p class="mut" style="color:#b45309">⚠️ Hors ligne : données partielles (derniers BL chargés et règlements en attente).</p>':'')
+  +`<p class="mut">${esc(relPer(R))}</p><div class="kp"><div>Solde actuel<b class="${R.solde>0?'neg':''}">${fmt(R.solde)}</b></div><div>Total débit (période)<b>${fmt(R.deb)}</b></div><div>Total crédit (période)<b>${fmt(R.cre)}</b></div><div>Solde fin de période<b>${fmt(R.close)}</b></div></div>`
+  +table(['Date','Opération','Débit','Crédit','Solde'],[...(R.from?[`<tr style="background:#f8f9fa"><td></td><td><i>Solde reporté</i></td><td></td><td></td><td class="nw">${fmt(R.open)}</td></tr>`]:[]),
+    ...R.rows.map(m=>`<tr><td class="nw">${fd2(m.d)}</td><td>${esc(m.op)}</td><td class="nw">${n(m.deb)}</td><td class="nw">${n(m.cre)}</td><td class="nw">${fmt(m.s)}</td></tr>`)])}
+function relPdf(){const R=relData();if(!R)throw new Error('Aucun client');const {jsPDF}=window.jspdf,d=new jsPDF(),c=R.c,h=hdr().slice(0,4);
+  if(h.length){d.setFontSize(9);d.text(h,196,12,{align:'right'})}
+  d.setFontSize(16);d.text('RELEVÉ DE COMPTE CLIENT',14,18);d.setFontSize(10);
+  const L=['Client : '+c.nom,...(c.code?['Code : '+c.code]:[]),...(c.telephone?['Tél : '+c.telephone]:[]),...(c.matricule_fiscal?['MF : '+c.matricule_fiscal]:[]),...(c.adresse?d.splitTextToSize('Adresse : '+c.adresse,120):[]),relPer(R)];
+  d.text(L,14,26);
+  d.autoTable({startY:26+L.length*5+4,head:[['Date','Opération','Débit','Crédit','Solde']],
+    body:[...(R.from?[['','Solde reporté','','',n3(R.open)]]:[]),...R.rows.map(m=>[fd2(m.d),m.op,m.deb?n3(m.deb):'',m.cre?n3(m.cre):'',n3(m.s)]),['','TOTAL DE LA PÉRIODE',n3(R.deb),n3(R.cre),n3(R.close)]],
+    styles:{fontSize:8},headStyles:{fillColor:[30,45,61]},columnStyles:{2:{halign:'right'},3:{halign:'right'},4:{halign:'right'}},
+    didParseCell:x=>{if(x.section==='body'&&/^(TOTAL|Solde reporté)/.test(String(x.row.raw[1])))x.cell.styles.fontStyle='bold'}});
+  let y=d.lastAutoTable.finalY+9;if(y>270){d.addPage();y=20}d.setFontSize(12);d.text('Solde à la fin de la période : '+fmt(R.close),196,y,{align:'right'});
+  d.setFontSize(10);d.text('Solde actuel du compte : '+fmt(R.solde),196,y+7,{align:'right'});blFoot(d);return d}
+const escRel=(R,W)=>escp(W,({T,C,H,L})=>{C([27,97,1]);hdr().forEach(x=>wrap(x,W).forEach(y=>T(y)));C([27,69,1,29,33,17]);T('RELEVÉ CLIENT');C([29,33,0]);wrap(R.c.nom,W).forEach(y=>T(y));C([27,69,0]);T(relPer(R));C([27,97,0]);T(H);
+  if(R.from)L('Solde reporté',fmt(R.open));R.rows.forEach(m=>{wrap(fd2(m.d)+' '+m.op,W).forEach(y=>T(y));L(mvL(m),'Solde '+n3(m.s))});
+  T(H);L('Total débit',fmt(R.deb));L('Total crédit',fmt(R.cre));C([27,69,1,29,33,1]);L('SOLDE',fmt(R.close));C([29,33,0,27,69,0]);T(H);C([27,97,1]);ftr().forEach(x=>wrap(x,W).forEach(y=>T(y)))});
+function relTick(w){const R=relData();if(!R)return;
+  if(pmode()==='rawbt')return rawbt(escRel(R,pw()));
+  if(!w&&!BT?.dev&&btSaved())return btRestore().then(()=>relTick(1));
+  if(BT?.dev)return btSend(escRel(R,pw())).catch(btErr);
+  $('tk').innerHTML=hdr().map(x=>'<p class="c">'+esc(x)+'</p>').join('')+`<h2>RELEVÉ CLIENT</h2><p class="c">${esc(R.c.nom)}<br>${esc(relPer(R))}</p><hr>`
+    +(R.from?`<div class="r"><span>Solde reporté</span><span>${fmt(R.open)}</span></div>`:'')
+    +R.rows.map(m=>`<div>${fd2(m.d)} ${esc(m.op)}</div><div class="r"><span>${mvL(m)}</span><span>Solde ${n3(m.s)}</span></div>`).join('')
+    +`<hr><div class="r"><span>Total débit</span><span>${fmt(R.deb)}</span></div><div class="r"><span>Total crédit</span><span>${fmt(R.cre)}</span></div><div class="r t"><span>SOLDE</span><span>${fmt(R.close)}</span></div><hr><p class="c">${ftr().map(esc).join('<br>')}</p>`;pr()}
+function relText(R){const L=[...hdr(),'*RELEVÉ DE COMPTE*','Client : '+R.c.nom,relPer(R),'------------------------------'],last=R.rows.slice(-10);
+  if(R.from)L.push('Solde reporté : '+fmt(R.open));if(R.rows.length>last.length)L.push('… '+(R.rows.length-last.length)+' opération(s) plus anciennes (voir le PDF)');
+  last.forEach(m=>L.push(fd2(m.d)+' '+m.op+'\n   '+mvL(m)+' -> solde '+n3(m.s)));
+  L.push('------------------------------','Total débit : '+fmt(R.deb),'Total crédit : '+fmt(R.cre),'*SOLDE : '+fmt(R.close)+'*','',...ftr());return L.join('\n')}
+function relSend(){const R=relData();if(!R)return;
+  modal('Envoyer le relevé',`<p class="mut">${esc(R.c.nom)}${R.c.telephone?' · '+esc(R.c.telephone):''}</p><div style="display:grid;gap:8px"><button class="btn g" data-act="rws">💬 WhatsApp (message résumé)</button><button class="btn s" data-act="rwp">📎 Partager le PDF complet</button></div>`,closeModal);$('mok').hidden=true}
+function relWA(){const R=relData();if(!R)return;closeModal();window.open('https://wa.me/'+waNum(R.c.telephone)+'?text='+encodeURIComponent(relText(R)),'_blank')}
+async function relShare(){const R=relData();if(!R)return;closeModal();const f=new File([relPdf().output('blob')],relFile(R),{type:'application/pdf'});
+  try{if(navigator.canShare?.({files:[f]}))await navigator.share({files:[f],title:'Relevé '+R.c.nom});else{dl(f.name,f);toast('PDF téléchargé : joignez-le à votre message')}}catch(e){if(e.name!=='AbortError')toast(e.message,1)}}
+
 // ── Événements ──
 const A={logout:async()=>{if(QUEUE.length&&!confirm(QUEUE.length+' opération(s) pas encore synchronisée(s) restent sur cet appareil. Se déconnecter quand même ?'))return;try{await IDB.set('user',null)}catch{}try{await sb.auth.signOut()}catch{}location.reload()},
   install:async()=>{if(!IP)return;IP.prompt();await IP.userChoice;IP=null;$('inst').hidden=true},
   sync:async()=>{if(QUEUE.length){const n=await syncQueue();if(n&&!QUEUE.length)loadAll()}else loadAll()},refresh:async()=>{await loadAll();toast('Actualisé')},close:closeModal,
   pickA,inc:d=>{panier[d.i].qte++;cart()},dec:d=>{if(--panier[d.i].qte<=0)panier.splice(d.i,1);cart()},rm:d=>{panier.splice(d.i,1);cart()},valider,cancel:reset,
   edit:d=>formModal(articles.find(x=>x.id===d.id)),add:()=>formModal(),del:d=>del(d.id),
-  addC:()=>cliModal(),jp,jx,jf,jt:()=>jtick(),jc,btpair,scan,scanx:()=>qrStop(),torch,camsw,raz:razStock,spick:d=>{stkPick(articles.find(x=>x.id===d.id));$('sq').value='';$('ddq').hidden=true;$('sq').focus()},gostk:()=>go('stk'),send:sendBL,sw:sendWA,sm:sendMail,sp:sendPdf,svalid:stkValid,sinc:d=>{SL[d.i].qte++;stkRender()},sdec:d=>{SL[d.i].qte=Math.max(0,SL[d.i].qte-1);stkRender()},srm:d=>{SL.splice(d.i,1);stkRender()},cdebt:()=>{debtOnly=!debtOnly;renderCli()},xl:d=>exportXlsx(d.t),bak:backup,rest:()=>$('fr').click(),imp:d=>{$('fi').dataset.t=d.t;$('fi').click()},
+  addC:()=>cliModal(),jp,jx,jf,jt:()=>jtick(),jc,btpair,scan,scanx:()=>qrStop(),torch,camsw,raz:razStock,setsave:setSave,settest:setTest,rel:relOpen,rp:relRange,rpdf:()=>relPdf().save(relFile(relData())),rsend:relSend,rws:relWA,rwp:relShare,rtk:()=>relTick(),spick:d=>{stkPick(articles.find(x=>x.id===d.id));$('sq').value='';$('ddq').hidden=true;$('sq').focus()},gostk:()=>go('stk'),send:sendBL,sw:sendWA,sm:sendMail,sp:sendPdf,svalid:stkValid,sinc:d=>{SL[d.i].qte++;stkRender()},sdec:d=>{SL[d.i].qte=Math.max(0,SL[d.i].qte-1);stkRender()},srm:d=>{SL.splice(d.i,1);stkRender()},cdebt:()=>{debtOnly=!debtOnly;renderCli()},xl:d=>exportXlsx(d.t),bak:backup,rest:()=>$('fr').click(),imp:d=>{$('fi').dataset.t=d.t;$('fi').click()},
   delAll:async d=>{if(!confirm('Supprimer TOUS les '+d.t+' ? Cette action est définitive.'))return;const {error}=await sb.from(d.t).delete().not('id','is',null);if(error)return toast(error.message,1);toast('Supprimé');loadAll()},editC:d=>cliModal(clients.find(x=>x.id===d.id)),reg:d=>regModal(clients.find(x=>x.id===d.id)),delC:d=>delC(d.id),
   tick:d=>tick(bls.find(c=>c.id===d.id)),editBL,delBL};
 document.addEventListener('click',e=>{if(!e.target.closest('.dd-wrap')){$('dda').hidden=true;$('ddq').hidden=true}
@@ -495,6 +570,7 @@ document.addEventListener('change',async e=>{const t=e.target;
   if(t.dataset.p!==undefined){panier[t.dataset.p].prix=Math.max(0,parseFloat(t.value)||0);cart()}
   if(t.dataset.sq!==undefined){SL[t.dataset.sq].qte=Math.max(0,parseFloat(t.value)||0);stkRender()}
   if(t.id==='jd1'||t.id==='jd2')loadJournal();
+  if(t.id==='rd1'||t.id==='rd2')renderRel();
   if(t.dataset.u){const {error}=await sb.from('profiles').update({role:t.value}).eq('id',t.dataset.u);toast(error?error.message:'Rôle mis à jour',!!error)}
   if(t.id==='fr'&&t.files[0]){await restore(t.files[0]);t.value=''}
   if(t.id==='fi'&&t.files[0]){try{await importFile(t.dataset.t,t.files[0])}catch(x){toast('Import : '+x.message,1)}t.value=''}});
